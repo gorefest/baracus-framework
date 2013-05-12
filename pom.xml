@@ -1,0 +1,150 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>net.mantucon.baracus</groupId>
+  <artifactId>baracus-framework</artifactId>
+  <version>0.4-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>baracus-framework</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+     <platform.version>4.0.1.2</platform.version>     
+  </properties>
+
+
+  <dependencies>
+      <dependency>
+          <groupId>com.google.android</groupId>
+          <artifactId>android</artifactId>
+          <version>${platform.version}</version>
+          <scope>provided</scope>
+      </dependency>
+      <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>4.7</version>
+          <scope>test</scope>
+      </dependency>
+  </dependencies>
+
+  <build>
+      <plugins>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-source-plugin</artifactId>
+              <version>2.0.4</version>
+              <executions>
+                  <execution>
+                      <goals>
+                          <goal>jar</goal>
+                      </goals>
+                  </execution>
+              </executions>
+          </plugin>
+
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+              <version>2.9</version>
+              <configuration>
+                  <outputDirectory>${project.build.directory}/javadoc</outputDirectory>
+                  <reportOutputDirectory>${project.build.directory}/javadoc</reportOutputDirectory>
+              </configuration>
+          </plugin>
+
+              <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-resources-plugin</artifactId>
+                  <version>2.3</version>
+                  <configuration>
+                      <outputDirectory>${docs.directory}/${project.version}</outputDirectory>
+                      <resources>
+                          <resource>
+                            <directory>${project.build.directory}/javadoc/apidocs/</directory>
+                            <includes><include>**/*</include></includes>
+                          </resource>
+                      </resources>
+                  </configuration>
+                  <executions>
+                      <execution>
+                          <goals>
+                              <goal>copy-resources</goal>
+                          </goals>
+                          <phase>
+                              site
+                          </phase>
+                      </execution>
+                  </executions>
+              </plugin>
+
+      </plugins>
+
+  </build>
+
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <properties>
+                <platform.version>4.0.1.2</platform.version>
+                <android.sdk.path>C:/adt-bundle-windows-x86-20130219/sdk</android.sdk.path>
+                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+                <docs.directory>C:/Temp/apidocs</docs.directory>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>linux</id>
+            <properties>
+                <platform.version>4.0.1.2</platform.version>
+                <android.sdk.path>/usr/java/adt-bundle-linux-x86_64/sdk</android.sdk.path>
+                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+            </properties>
+
+        </profile>
+
+        <profile>
+            <id>ci-system</id>
+            <properties>
+                <platform.version>4.0.1.2</platform.version>
+                <android.sdk.path>/usr/java/android-sdk-linux</android.sdk.path>
+                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+                <docs.directory>/var/www/baracus/apidocs</docs.directory>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>deployment-nexus</id>
+            <distributionManagement>
+                <!-- Publish versioned releases here -->
+                <repository>
+                    <id>mantucon-repo</id>
+                    <name>MANTUCON Release NEXUS</name>
+                    <url>http://www.mantucon.net/nexus/content/repositories/releases</url>
+                </repository>
+
+                <!-- Publish snapshots here -->
+                <snapshotRepository>
+                    <id>mantucon-repo</id>
+                    <name>MANTUCON Snapshot NEXUS</name>
+                    <url>http://www.mantucon.net/nexus/content/repositories/snapshots</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+    </profiles>
+    <repositories>
+        <repository>
+            <id>mantucon-repo</id>
+            <name>MANTUCON NEXUS</name>
+            <url>http://www.mantucon.net/nexus/content/groups/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+</project>
