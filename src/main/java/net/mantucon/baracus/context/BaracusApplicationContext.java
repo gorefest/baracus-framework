@@ -2,6 +2,8 @@ package net.mantucon.baracus.context;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.FragmentManager;
+import android.content.ComponentCallbacks;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -129,6 +131,7 @@ public abstract class BaracusApplicationContext extends Application {
 
     public static synchronized void make() {
         if (!semaphore) {
+            semaphore = true;
             callbacks = new ActivityLifecycleCallbacks() {
                 @Override
                 public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
@@ -140,7 +143,6 @@ public abstract class BaracusApplicationContext extends Application {
                         initApplicationContext();
                     }
                     beanContainer.performInjection(activity);
-
 
                 }
 
@@ -186,7 +188,10 @@ public abstract class BaracusApplicationContext extends Application {
             __instance.registerActivityLifecycleCallbacks(callbacks);
 
 
+
         }
+
+        semaphore = false;
 
         refCount++;
     }
@@ -331,7 +336,7 @@ public abstract class BaracusApplicationContext extends Application {
     }
 
     /**
-     * @return the open helper
+     * @return the open helper. currently needed by the dao.
      */
     public static synchronized BaracusOpenHelper connectOpenHelper() {
         if (baracusOpenHelper == null) {
@@ -347,11 +352,33 @@ public abstract class BaracusApplicationContext extends Application {
         return baracusOpenHelper;
     }
 
+    /**
+     * returns the baracus application context instance. notice,
+     * normally you should not need this instance and fully rely
+     * on the automated injection mechanisms
+     *
+     * @return the baracus application context instance
+     */
     public static BaracusApplicationContext getInstance() {
         return __instance;
     }
 
-    public static <T> T  getBean(Class<T> bean) {
-        return (T) BeanContainer.clazzMap.get(bean);
+    /**
+     * @param clazz - the class of the bean to be returned
+     * @param <T> - class parametrizer
+     * @return the instance of the bean or null
+     */
+    public static <T> T  getBean(Class<T> clazz) {
+        return (T) BeanContainer.clazzMap.get(clazz);
+    }
+
+    /**
+     * run a type based dependency injection on the passed object
+     * @param o - the object where injection shall be performed on
+     */
+    public synchronized  static void performInjectionsOn(Object o) {
+        if (!semaphore) {
+            beanContainer.performInjection(o);
+        }
     }
 }
