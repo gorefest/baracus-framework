@@ -2,22 +2,16 @@ package net.mantucon.baracus.context;
 
 import android.app.Activity;
 import android.app.Application;
-import android.app.FragmentManager;
-import android.content.ComponentCallbacks;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import net.mantucon.baracus.dao.BaracusOpenHelper;
 import net.mantucon.baracus.dao.ConfigurationDao;
-import net.mantucon.baracus.lifecycle.Destroyable;
-import net.mantucon.baracus.lifecycle.Initializeable;
 import net.mantucon.baracus.orm.AbstractModelBase;
 import net.mantucon.baracus.signalling.DataSetChangeAwareComponent;
 import net.mantucon.baracus.signalling.DeleteAwareComponent;
 import net.mantucon.baracus.util.Logger;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -100,7 +94,6 @@ public abstract class BaracusApplicationContext extends Application {
         registerBeanClass(ConfigurationDao.class);
     }
 
-
     private static String databasePath;
 
     public BaracusApplicationContext() {
@@ -121,6 +114,7 @@ public abstract class BaracusApplicationContext extends Application {
     public static synchronized void initApplicationContext() {
         if (!init) {
             beanContainer.createInstances();
+            beanContainer.holdBean(Context.class, __instance);   // Inject a context simply
             beanContainer.performInjections();
             beanContainer.performPostConstuct();
             beanContainer.treatKnownUiComponents();
@@ -379,6 +373,23 @@ public abstract class BaracusApplicationContext extends Application {
     public synchronized  static void performInjectionsOn(Object o) {
         if (!semaphore) {
             beanContainer.performInjection(o);
+        }
+    }
+
+    /**
+     * creates a bean instance not cached by the container - no singleton! -
+     * for your personal transient use. does not support custom constructors!
+     * @param clazz - the class to be instantiaten
+     * @param <T> the type
+     * @return an instance of T with all refs to components injected
+     */
+    public static <T> T createPrototypeBean(Class<T> clazz) {
+        try {
+            T instance = beanContainer.instantiatePojo(clazz);
+            performInjectionsOn(instance);
+            return instance;
+        } catch (Exception e) {
+            throw new Exceptions.IntantiationException(e);
         }
     }
 }

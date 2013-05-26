@@ -9,6 +9,7 @@ import net.mantucon.baracus.lifecycle.Destroyable;
 import net.mantucon.baracus.lifecycle.Initializeable;
 import net.mantucon.baracus.util.Logger;
 
+import net.mantucon.baracus.context.Exceptions.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -41,16 +42,6 @@ public class BeanContainer {
 
 
     /**
-     * Bean instanciation fucked up. Thrown when the instantiation of
-     * a bean caised an errer
-     */
-    public static class IntantiationException extends RuntimeException {
-        IntantiationException(Throwable reason) {
-            super(reason);
-        }
-    }
-
-    /**
      * Exception while destroying a bean. thrown if a shutdown caused
      * an error
      */
@@ -60,29 +51,6 @@ public class BeanContainer {
         }
     }
 
-    /**
-     * Registration of a bean failed.
-     */
-    public static class RegistrationException extends RuntimeException {
-        RegistrationException(Throwable reason) {
-            super(reason);
-        }
-    }
-
-    /**
-     * Injection of a bean caused an error
-     */
-    public static class InjectionException extends RuntimeException {
-        InjectionException(Throwable reason) {
-            super(reason);
-        }
-        InjectionException(String msg, Throwable reason) {
-            super(msg, reason);
-        }
-    }
-
-
-
 
     /**
      * instanciate all registered beans
@@ -91,11 +59,11 @@ public class BeanContainer {
         for (Class<?> clazz : clazzMap.keySet()) {
             if (clazzMap.get(clazz) == null) {
                 try {
-                    instantiateBean(clazz);
+                    instantiateSingletonBean(clazz);
                     logger.debug("Instantiation of $1 succeded.", clazz.getName());
                 } catch (Exception e) {
                     logger.debug("Instantiation of $1 failed. Reason : $2", clazz.getName(), e.getMessage());
-                    throw new IntantiationException(e);
+                    throw new Exceptions.IntantiationException(e);
                 }
             }
         }
@@ -244,8 +212,22 @@ public class BeanContainer {
      * @throws IllegalAccessException
      * @throws java.lang.reflect.InvocationTargetException
      */
-    void instantiateBean(Class<?> theClazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        Object result = null;
+    void instantiateSingletonBean(Class<?> theClazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        Object result = instantiatePojo(theClazz);
+        holdBean(theClazz, result);
+    }
+
+    /**
+     * create an instance of the passed class regarding the application context contructor
+     *
+     * @param theClazz
+     * @return
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    <T> T instantiatePojo(Class<T> theClazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        T result = null;
         for (Constructor c : theClazz.getConstructors()) {
             Class<?>[] parameterTypes = c.getParameterTypes();
             if (parameterTypes == null || parameterTypes.length == 0) {
@@ -253,7 +235,7 @@ public class BeanContainer {
                 result = theClazz.newInstance();
                 break;
             } else if (parameterTypes.length == 1 && parameterTypes[0].equals(Context.class)) {
-                result =   c.newInstance(BaracusApplicationContext.getContext());
+                result = (T)  c.newInstance(BaracusApplicationContext.getContext());
                 break;
             }
         }
@@ -261,9 +243,7 @@ public class BeanContainer {
         if (result == null) {
             throw new InstantiationException(theClazz.getName()+" could not be instantiated. Please provide a) a public default constructor or b) a public constructor takinng the Android Context as it's only parameter!");
         }
-
-
-        holdBean(theClazz, result);
+        return result;
     }
 
     /**
