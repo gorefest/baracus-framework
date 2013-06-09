@@ -8,6 +8,7 @@ import android.os.Bundle;
 import net.mantucon.baracus.dao.BaracusOpenHelper;
 import net.mantucon.baracus.dao.ConfigurationDao;
 import net.mantucon.baracus.orm.AbstractModelBase;
+import net.mantucon.baracus.signalling.DataChangeAwareComponent;
 import net.mantucon.baracus.signalling.DataSetChangeAwareComponent;
 import net.mantucon.baracus.signalling.DeleteAwareComponent;
 import net.mantucon.baracus.util.Logger;
@@ -81,6 +82,7 @@ public abstract class BaracusApplicationContext extends Application {
     // Awareness Refs
     protected final static Map<Class<?>, DeleteAwareComponent> deleteListeners = new HashMap<Class<?>, DeleteAwareComponent>();
     protected final static Map<Class<?>, DataSetChangeAwareComponent> changeListener = new HashMap<Class<?>, DataSetChangeAwareComponent>();
+    protected final static Map<Class<?>, Set<DataChangeAwareComponent>> dataListener = new HashMap<Class<?>, Set<DataChangeAwareComponent>>();
 
     private static final Logger logger = new Logger(BaracusApplicationContext.class);
 
@@ -114,7 +116,7 @@ public abstract class BaracusApplicationContext extends Application {
     public static synchronized void initApplicationContext() {
         if (!init) {
             beanContainer.createInstances();
-            beanContainer.holdBean(Context.class, __instance);   // Inject a context simply
+//            beanContainer.holdBean(Context.class, __instance);   // Inject a context simply
             beanContainer.performInjections();
             beanContainer.performPostConstuct();
             beanContainer.treatKnownUiComponents();
@@ -302,6 +304,50 @@ public abstract class BaracusApplicationContext extends Application {
             }
         }
     }
+
+
+    /**
+     * register a change listener on the entity. @see registerDeleteListener. same restrictions, same behaviour
+     * but this time for change events
+     *
+     * @param clazz
+     * @param dac
+     */
+    public static synchronized void registerDataChangeListener(Class<? extends AbstractModelBase> clazz, DataChangeAwareComponent dac) {
+        logger.debug("Registered SetChangeListener $1 for class $2", clazz.getSimpleName(), dac.getClass().getSimpleName());
+        Set<DataChangeAwareComponent> set = dataListener.get(clazz);
+        if (set == null) {
+            set = new HashSet<DataChangeAwareComponent>();
+            dataListener.put(clazz, set);
+        }
+        set.add(dac);
+    }
+
+    /**
+     * emits a change event on a single data object to all registered event recipients
+     *
+     * @param changedItem - the changed item
+     */
+    public static synchronized void emitDataChangeEvent(AbstractModelBase changedItem) {
+
+        if (changedItem != null) {
+            if (dataListener.containsKey(changedItem.getClass())) {
+                Set<DataChangeAwareComponent> dac = dataListener.get(changedItem.getClass());
+                if (dac != null && dac.size() > 0) {
+                    try {
+                        for (DataChangeAwareComponent component : dac) {
+                            component.onChange(changedItem);
+                        }
+                    } catch (Exception e) {
+                        logger.error("Caught exception while emitting change set event", e);
+                        dac.remove(changedItem.getClass());
+                    }
+                }
+            }
+        }
+    }
+
+
 
     /**
      * @return the android context

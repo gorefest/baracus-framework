@@ -134,6 +134,14 @@ public class BeanContainer {
                     } catch (IllegalAccessException e) {
                         throw new InjectionException("OMG OpenHelper injection issued a major clusterfuck",e);
                     }
+                } else if (type.equals(Context.class.getName())) {
+                    field.setAccessible(true);
+                    logger.debug("$1.$2 candidate is $3",clazz.getName(),field.getName(),clazz2.getName());
+                    try {
+                        field.set(o, BaracusApplicationContext.getInstance());
+                    } catch (IllegalAccessException e) {
+                        throw new InjectionException("OMG Context injection issued a major clusterfuck",e);
+                    }
                 }
             }
         }
