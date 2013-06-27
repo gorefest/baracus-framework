@@ -8,9 +8,7 @@ import android.os.Bundle;
 import net.mantucon.baracus.dao.BaracusOpenHelper;
 import net.mantucon.baracus.dao.ConfigurationDao;
 import net.mantucon.baracus.orm.AbstractModelBase;
-import net.mantucon.baracus.signalling.DataChangeAwareComponent;
-import net.mantucon.baracus.signalling.DataSetChangeAwareComponent;
-import net.mantucon.baracus.signalling.DeleteAwareComponent;
+import net.mantucon.baracus.signalling.*;
 import net.mantucon.baracus.util.Logger;
 
 import java.lang.reflect.InvocationTargetException;
@@ -83,6 +81,8 @@ public abstract class BaracusApplicationContext extends Application {
     protected final static Map<Class<?>, DeleteAwareComponent> deleteListeners = new HashMap<Class<?>, DeleteAwareComponent>();
     protected final static Map<Class<?>, DataSetChangeAwareComponent> changeListener = new HashMap<Class<?>, DataSetChangeAwareComponent>();
     protected final static Map<Class<?>, Set<DataChangeAwareComponent>> dataListener = new HashMap<Class<?>, Set<DataChangeAwareComponent>>();
+    protected final static Map<Class<? extends GenericEvent>, Set<GenericEventAwareComponent<? extends GenericEvent>>> eventConsumers = new HashMap<Class<? extends GenericEvent>, Set<GenericEventAwareComponent<? extends GenericEvent>>>();
+
 
     private static final Logger logger = new Logger(BaracusApplicationContext.class);
 
@@ -346,6 +346,53 @@ public abstract class BaracusApplicationContext extends Application {
             }
         }
     }
+
+    /**
+     * register a generic listener for a generic event.
+     *
+     * @param eventClass - the event class
+     * @param handler - the handler
+     */
+    public static synchronized void registerGenericListener(Class<? extends GenericEvent> eventClass, GenericEventAwareComponent<?> handler) {
+        logger.debug("Registered Generic Listener $1 for class $2", eventClass.getSimpleName(), handler.getClass().getSimpleName());
+        Set<GenericEventAwareComponent<? extends GenericEvent>> set = eventConsumers.get(eventClass);
+        if (set == null) {
+            set = new HashSet<GenericEventAwareComponent<? extends GenericEvent>>();
+            eventConsumers.put(eventClass, set);
+        }
+        set.add(handler);
+    }
+
+    /**
+     * Free all consumers of an generic event
+     * @param eventClass
+     */
+    public static synchronized void freeGenericListeners(Class<? extends GenericEvent> eventClass){
+        Set<GenericEventAwareComponent<? extends GenericEvent>> set = eventConsumers.get(eventClass);
+        if (set != null) {
+            set.clear();
+        }
+    }
+
+
+    /**
+     * emit a generic event to all registered listeners
+     * @param event
+     */
+    public static synchronized void emitGenericEvent(GenericEvent event) {
+        Set<GenericEventAwareComponent<?>> receivers = eventConsumers.get(event.getClass());
+        if (receivers != null) {
+            for (GenericEventAwareComponent receiver : receivers) {
+                try {
+                    receiver.handleEvent(event);
+                } catch (Exception e) {
+                    logger.error("Caught exception while emitting generic event", e);
+                    receivers.remove(receiver);
+                }
+            }
+        }
+    }
+
 
 
 
