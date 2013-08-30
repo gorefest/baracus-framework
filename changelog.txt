@@ -1,0 +1,6 @@
+VERSION 0.5
+
+- prototype beans now supported. prototype beans are bean instances with DI that are no singleton for
+  in-application use
+- context now injecteable
+- Exceptions in context and bean handling reused

@@ -262,6 +262,9 @@ public abstract class BaseDao<T extends AbstractModelBase>{
     public void save(T item, TxHandle handle) {
         logger.trace("save object $1",item);
 
+        boolean requiresSetChange = false;
+        boolean requiresInstanceChange = false;
+
         RowMapper<T> rowMapper = getRowMapper();
         ContentValues cv = rowMapper.getContentValues(item);
 
@@ -280,6 +283,7 @@ public abstract class BaseDao<T extends AbstractModelBase>{
                 long key = db.insert(rowMapper.getAffectedTable(), null, cv);
                 item.setId(key);
                 item.setTransient(false);
+                requiresSetChange = true;
             } else {
                 if (item instanceof Timestamped)  {
                     Timestamped t = (Timestamped) item;
@@ -287,6 +291,7 @@ public abstract class BaseDao<T extends AbstractModelBase>{
                     t.setLastModificationDate(new Date());
                 }
                 db.update(rowMapper.getAffectedTable(), cv, AbstractModelBase.idCol.fieldName + "= ?", new String[]{item.getId().toString()});
+                requiresInstanceChange = true;
             }
             if (localTransaction) {
                 db.setTransactionSuccessful();
@@ -297,7 +302,13 @@ public abstract class BaseDao<T extends AbstractModelBase>{
             }
         }
 
-        BaracusApplicationContext.emitSetChangeEvent(getManagedClass());
+        if (requiresSetChange) {
+            BaracusApplicationContext.emitSetChangeEvent(getManagedClass());
+        }
+
+        if (requiresInstanceChange) {
+            BaracusApplicationContext.emitDataChangeEvent(item);
+        }
     }
 
     /**

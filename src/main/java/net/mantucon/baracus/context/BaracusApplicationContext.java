@@ -7,15 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import net.mantucon.baracus.dao.BaracusOpenHelper;
 import net.mantucon.baracus.dao.ConfigurationDao;
-import net.mantucon.baracus.lifecycle.Destroyable;
-import net.mantucon.baracus.lifecycle.Initializeable;
 import net.mantucon.baracus.orm.AbstractModelBase;
-import net.mantucon.baracus.signalling.DataSetChangeAwareComponent;
-import net.mantucon.baracus.signalling.DeleteAwareComponent;
+import net.mantucon.baracus.signalling.*;
 import net.mantucon.baracus.util.Logger;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -85,6 +80,9 @@ public abstract class BaracusApplicationContext extends Application {
     // Awareness Refs
     protected final static Map<Class<?>, DeleteAwareComponent> deleteListeners = new HashMap<Class<?>, DeleteAwareComponent>();
     protected final static Map<Class<?>, DataSetChangeAwareComponent> changeListener = new HashMap<Class<?>, DataSetChangeAwareComponent>();
+    protected final static Map<Class<?>, Set<DataChangeAwareComponent>> dataListener = new HashMap<Class<?>, Set<DataChangeAwareComponent>>();
+    protected final static Map<Class<? extends GenericEvent>, Set<GenericEventAwareComponent<? extends GenericEvent>>> eventConsumers = new HashMap<Class<? extends GenericEvent>, Set<GenericEventAwareComponent<? extends GenericEvent>>>();
+
 
     private static final Logger logger = new Logger(BaracusApplicationContext.class);
 
@@ -97,7 +95,6 @@ public abstract class BaracusApplicationContext extends Application {
     static{
         registerBeanClass(ConfigurationDao.class);
     }
-
 
     private static String databasePath;
 
@@ -119,6 +116,7 @@ public abstract class BaracusApplicationContext extends Application {
     public static synchronized void initApplicationContext() {
         if (!init) {
             beanContainer.createInstances();
+//            beanContainer.holdBean(Context.class, __instance);   // Inject a context simply
             beanContainer.performInjections();
             beanContainer.performPostConstuct();
             beanContainer.treatKnownUiComponents();
@@ -129,6 +127,7 @@ public abstract class BaracusApplicationContext extends Application {
 
     public static synchronized void make() {
         if (!semaphore) {
+            semaphore = true;
             callbacks = new ActivityLifecycleCallbacks() {
                 @Override
                 public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
@@ -140,7 +139,6 @@ public abstract class BaracusApplicationContext extends Application {
                         initApplicationContext();
                     }
                     beanContainer.performInjection(activity);
-
 
                 }
 
@@ -186,7 +184,10 @@ public abstract class BaracusApplicationContext extends Application {
             __instance.registerActivityLifecycleCallbacks(callbacks);
 
 
+
         }
+
+        semaphore = false;
 
         refCount++;
     }
@@ -304,6 +305,97 @@ public abstract class BaracusApplicationContext extends Application {
         }
     }
 
+
+    /**
+     * register a change listener on the entity. @see registerDeleteListener. same restrictions, same behaviour
+     * but this time for change events
+     *
+     * @param clazz
+     * @param dac
+     */
+    public static synchronized void registerDataChangeListener(Class<? extends AbstractModelBase> clazz, DataChangeAwareComponent dac) {
+        logger.debug("Registered SetChangeListener $1 for class $2", clazz.getSimpleName(), dac.getClass().getSimpleName());
+        Set<DataChangeAwareComponent> set = dataListener.get(clazz);
+        if (set == null) {
+            set = new HashSet<DataChangeAwareComponent>();
+            dataListener.put(clazz, set);
+        }
+        set.add(dac);
+    }
+
+    /**
+     * emits a change event on a single data object to all registered event recipients
+     *
+     * @param changedItem - the changed item
+     */
+    public static synchronized void emitDataChangeEvent(AbstractModelBase changedItem) {
+
+        if (changedItem != null) {
+            if (dataListener.containsKey(changedItem.getClass())) {
+                Set<DataChangeAwareComponent> dac = dataListener.get(changedItem.getClass());
+                if (dac != null && dac.size() > 0) {
+                    try {
+                        for (DataChangeAwareComponent component : dac) {
+                            component.onChange(changedItem);
+                        }
+                    } catch (Exception e) {
+                        logger.error("Caught exception while emitting change set event", e);
+                        dac.remove(changedItem.getClass());
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * register a generic listener for a generic event.
+     *
+     * @param eventClass - the event class
+     * @param handler - the handler
+     */
+    public static synchronized void registerGenericListener(Class<? extends GenericEvent> eventClass, GenericEventAwareComponent<?> handler) {
+        logger.debug("Registered Generic Listener $1 for class $2", eventClass.getSimpleName(), handler.getClass().getSimpleName());
+        Set<GenericEventAwareComponent<? extends GenericEvent>> set = eventConsumers.get(eventClass);
+        if (set == null) {
+            set = new HashSet<GenericEventAwareComponent<? extends GenericEvent>>();
+            eventConsumers.put(eventClass, set);
+        }
+        set.add(handler);
+    }
+
+    /**
+     * Free all consumers of an generic event
+     * @param eventClass
+     */
+    public static synchronized void freeGenericListeners(Class<? extends GenericEvent> eventClass){
+        Set<GenericEventAwareComponent<? extends GenericEvent>> set = eventConsumers.get(eventClass);
+        if (set != null) {
+            set.clear();
+        }
+    }
+
+
+    /**
+     * emit a generic event to all registered listeners
+     * @param event
+     */
+    public static synchronized void emitGenericEvent(GenericEvent event) {
+        Set<GenericEventAwareComponent<?>> receivers = eventConsumers.get(event.getClass());
+        if (receivers != null) {
+            for (GenericEventAwareComponent receiver : receivers) {
+                try {
+                    receiver.handleEvent(event);
+                } catch (Exception e) {
+                    logger.error("Caught exception while emitting generic event", e);
+                    receivers.remove(receiver);
+                }
+            }
+        }
+    }
+
+
+
+
     /**
      * @return the android context
      */
@@ -331,7 +423,7 @@ public abstract class BaracusApplicationContext extends Application {
     }
 
     /**
-     * @return the open helper
+     * @return the open helper. currently needed by the dao.
      */
     public static synchronized BaracusOpenHelper connectOpenHelper() {
         if (baracusOpenHelper == null) {
@@ -347,11 +439,50 @@ public abstract class BaracusApplicationContext extends Application {
         return baracusOpenHelper;
     }
 
+    /**
+     * returns the baracus application context instance. notice,
+     * normally you should not need this instance and fully rely
+     * on the automated injection mechanisms
+     *
+     * @return the baracus application context instance
+     */
     public static BaracusApplicationContext getInstance() {
         return __instance;
     }
 
-    public static <T> T  getBean(Class<T> bean) {
-        return (T) BeanContainer.clazzMap.get(bean);
+    /**
+     * @param clazz - the class of the bean to be returned
+     * @param <T> - class parametrizer
+     * @return the instance of the bean or null
+     */
+    public static <T> T  getBean(Class<T> clazz) {
+        return (T) BeanContainer.clazzMap.get(clazz);
+    }
+
+    /**
+     * run a type based dependency injection on the passed object
+     * @param o - the object where injection shall be performed on
+     */
+    public synchronized  static void performInjectionsOn(Object o) {
+        if (!semaphore) {
+            beanContainer.performInjection(o);
+        }
+    }
+
+    /**
+     * creates a bean instance not cached by the container - no singleton! -
+     * for your personal transient use. does not support custom constructors!
+     * @param clazz - the class to be instantiaten
+     * @param <T> the type
+     * @return an instance of T with all refs to components injected
+     */
+    public static <T> T createPrototypeBean(Class<T> clazz) {
+        try {
+            T instance = beanContainer.instantiatePojo(clazz);
+            performInjectionsOn(instance);
+            return instance;
+        } catch (Exception e) {
+            throw new Exceptions.IntantiationException(e);
+        }
     }
 }

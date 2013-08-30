@@ -4,16 +4,25 @@
 
   <groupId>net.mantucon.baracus</groupId>
   <artifactId>baracus-framework</artifactId>
-  <version>0.3</version>
+  <version>0.5</version>
   <packaging>jar</packaging>
 
   <name>baracus-framework</name>
+  <description>The BARACUS Framework for lightweight DI, ORM and other cool stuff for Your Android application</description>
   <url>http://maven.apache.org</url>
 
   <properties>
-     <platform.version>4.0.1.2</platform.version>     
+     <platform.version>4.0.1.2</platform.version>
   </properties>
 
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
   <dependencies>
       <dependency>
@@ -134,6 +143,15 @@
             </distributionManagement>
         </profile>
     </profiles>
+
+    <developers>
+        <developer>
+            <id>Marcus.Noerder-Tuitje</id>
+            <name>Marcus Noerder-Tuitje</name>
+            <email>noerdertuitje@gmail.com</email>
+        </developer>
+    </developers>
+
     <repositories>
         <repository>
             <id>mantucon-repo</id>
@@ -147,4 +165,5 @@
             </snapshots>
         </repository>
     </repositories>
+
 </project>
