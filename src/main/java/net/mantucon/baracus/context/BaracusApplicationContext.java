@@ -374,6 +374,18 @@ public abstract class BaracusApplicationContext extends Application {
         }
     }
 
+    /**
+     * Free all consumers of data change event
+     * @param forClazz - the model class whose event listeners should be removed
+     */
+    public static synchronized void freeDataChangeListeners(Class<? extends AbstractModelBase> forClazz){
+        Set<DataChangeAwareComponent> set = dataListener.get(forClazz);
+        if (set != null) {
+            set.clear();
+        }
+    }
+
+
 
     /**
      * emit a generic event to all registered listeners
