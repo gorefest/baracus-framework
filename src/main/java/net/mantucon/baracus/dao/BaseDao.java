@@ -27,7 +27,9 @@ public abstract class BaseDao<T extends AbstractModelBase>{
     @Bean
     private SQLiteDatabase db;
 
-    private Logger logger = new Logger(this.getClass());
+    private final Logger logger = new Logger(this.getClass());
+
+    protected final Class<T> managedClass;
 
     /**
      * Rowmapper component providing the object mapping functions
@@ -110,6 +112,15 @@ public abstract class BaseDao<T extends AbstractModelBase>{
     }
 
     /**
+     * Lock-in Constructor. Replaces the deprecated getManagedClass() function in order to save
+     * performance
+     * @param managedClass - the model class Your Dao manages
+     */
+    protected BaseDao(Class<T> managedClass) {
+        this.managedClass = managedClass;
+    }
+
+    /**
      * performs a delete operation on the db
      * @param model
      * @return
@@ -118,7 +129,7 @@ public abstract class BaseDao<T extends AbstractModelBase>{
         int result=0;
         if (!model.isTransient()) {
             result = db.delete(model.getTableName(), AbstractModelBase.idCol.fieldName + " = ?", new String[]{model.getId().toString()});
-            BaracusApplicationContext.emitDeleteEvent(getManagedClass());
+            BaracusApplicationContext.emitDeleteEvent(managedClass);
             model.setTransient(true);
         } else {
             logger.warn("Warning. You tried to delete a transient entity of type $1. No operation performed!.",model.getClass().getName());
@@ -185,11 +196,6 @@ public abstract class BaseDao<T extends AbstractModelBase>{
         }
         return result;
     }
-
-    /**
-     * @return the entity class managed by your DAO. Needed for emitting class-related signals.
-     */
-    public abstract Class<? extends AbstractModelBase> getManagedClass();
 
     /**
      * @return all entities of Your type in database.
@@ -303,7 +309,7 @@ public abstract class BaseDao<T extends AbstractModelBase>{
         }
 
         if (requiresSetChange) {
-            BaracusApplicationContext.emitSetChangeEvent(getManagedClass());
+            BaracusApplicationContext.emitSetChangeEvent(managedClass);
         }
 
         if (requiresInstanceChange) {

@@ -226,6 +226,21 @@ public abstract class BaracusApplicationContext extends Application {
     }
 
     /**
+     * resolve a string and replace parameters by passed strings
+     * e.g. resolveString(R.string.foo,4711)
+     * single parameter function to avoid array wrapping in case of single parameters
+     *
+     * @param msgId - the android string resource id
+     * @param var - the variables replacing $1,$2...$n in the string
+     * @return the substituted string
+     */
+    public static String resolveString(Integer msgId, String var) {
+        String rawMsg = __instance.getApplicationContext().getString(msgId);
+        rawMsg = rawMsg.replace("$1", var);
+        return rawMsg;
+    }
+
+    /**
      * destroys the application context and shreds all beans. this function allows you
      * to shut down the entire bean context in your application without restarting it
      *

@@ -27,6 +27,10 @@ import static net.mantucon.baracus.orm.AbstractModelBase.idCol;
 @Bean
 public class ConfigurationDao extends BaseDao<ConfigurationParameter> {
 
+    public ConfigurationDao() {
+        super(ConfigurationParameter.class);
+    }
+
     /**
      * <pre>Row Mapper implementation for configuration parameter</pre>
      */
@@ -62,10 +66,6 @@ public class ConfigurationDao extends BaseDao<ConfigurationParameter> {
         }
     };
 
-    @Override
-    public Class<? extends AbstractModelBase> getManagedClass() {
-        return ConfigurationParameter.class;
-    }
 
     @Override
     public RowMapper<ConfigurationParameter> getRowMapper() {
