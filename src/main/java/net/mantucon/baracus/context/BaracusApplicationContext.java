@@ -1,16 +1,21 @@
 package net.mantucon.baracus.context;
 
+import android.R;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.View;
 import net.mantucon.baracus.dao.BaracusOpenHelper;
 import net.mantucon.baracus.dao.ConfigurationDao;
+import net.mantucon.baracus.errorhandling.ErrorHandler;
+import net.mantucon.baracus.errorhandling.ErrorSeverity;
 import net.mantucon.baracus.orm.AbstractModelBase;
 import net.mantucon.baracus.signalling.*;
 import net.mantucon.baracus.util.Logger;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -109,6 +114,15 @@ public abstract class BaracusApplicationContext extends Application {
     public static class ContextNotYetCreatedException extends RuntimeException {
         ContextNotYetCreatedException (String reason) {
             super(reason);
+        }
+    }
+
+    /**
+     * thrown, if a unlocateable resource is requested
+     */
+    private static final class BadResourceAccessException extends RuntimeException {
+        public BadResourceAccessException(Throwable throwable) {
+            super(throwable);
         }
     }
 
@@ -511,5 +525,95 @@ public abstract class BaracusApplicationContext extends Application {
         } catch (Exception e) {
             throw new Exceptions.IntantiationException(e);
         }
+    }
+
+    public static final int getResource(String name) {
+        try {
+            Field f = R.layout.class.getField(name);
+            return f.getInt(null);
+        } catch (Exception e) {
+            logger.error("ERROR!", e);
+            throw new BadResourceAccessException(e);
+        }
+    }
+
+    static Map<View, Map<Integer, Object[]>> errorMap = new HashMap<View, Map<Integer, Object[]>>();
+    public static volatile Map<Integer, ErrorHandler> registeredHandlers = new HashMap<Integer, ErrorHandler>();
+
+
+    public static void addErrorToView(View container, int affectedResource, int messageId, ErrorSeverity severity, String... params) {
+        if (!errorMap.containsKey(container)) {
+            errorMap.put(container, new HashMap<Integer, Object[]>());
+        }
+
+        Map<Integer, Object[]> assignment = errorMap.get(container);
+        Object[] values = new Object[params != null ? params.length + 2 : 2];
+
+        int id = -1;
+        if (registeredHandlers.containsKey(affectedResource)) {
+            id = registeredHandlers.get(affectedResource).getId();
+        } else {
+            id = affectedResource;
+        }
+
+        values[0] = Integer.valueOf(messageId);
+        values[1] = severity;
+
+        if (params != null && params.length > 0) {
+            int i = 2;
+            for (String param : params) {
+                values[i] = param;
+                i++;
+            }
+        }
+
+        assignment.put(id, values);
+    }
+
+    public static void applyErrorsOnView(View container) {
+        if (!errorMap.containsKey(container)) {
+            return;
+        }
+
+        Map<Integer, Object[]> assignments = errorMap.get(container);
+
+        for (Integer key : assignments.keySet()) {
+            Object[] params = assignments.get(key);
+            ErrorHandler errorHandler = (ErrorHandler) container.findViewById(key);
+            if (errorHandler != null) {
+                if (params.length > 2) {
+
+                } else {
+                    Integer msgId = (Integer) params[0];
+                    ErrorSeverity severity = (ErrorSeverity) params[1];
+                    errorHandler.handleError(container, msgId, severity);
+                }
+            }
+        }
+    }
+
+    public static void resetErrors(View container) {
+        if (errorMap.containsKey(container)) {
+            Map<Integer, Object[]> assignments = errorMap.get(container);
+
+            for (Integer key : assignments.keySet()) {
+                Object[] params = assignments.get(key);
+                ErrorHandler errorHandler = (ErrorHandler) container.findViewById(key);
+                if (errorHandler != null) {
+                    errorHandler.reset(container);
+                }
+            }
+
+        }
+    }
+
+    public static void registerErrorHandler(ErrorHandler errorHandler) {
+        if (errorHandler.getIdToDisplayFor() != -1) {
+            registeredHandlers.put(errorHandler.getIdToDisplayFor(), errorHandler);
+        }
+    }
+
+    public static void unregisterErrorhandlersForView(View container) {
+        errorMap.remove(container);
     }
 }

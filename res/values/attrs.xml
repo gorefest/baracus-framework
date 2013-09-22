@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ErrorView">
+        <attr name="displayMessageFor" format="reference" />
+        <attr name="highlightTarget" format="boolean"/>
+    </declare-styleable>
+</resources>

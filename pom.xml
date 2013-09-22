@@ -1,19 +1,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>net.mantucon.baracus</groupId>
-  <artifactId>baracus-framework</artifactId>
-  <version>0.6-SNAPSHOT</version>
-  <packaging>jar</packaging>
+    <groupId>net.mantucon.baracus</groupId>
+    <artifactId>baracus-framework</artifactId>
+    <version>0.6-SNAPSHOT</version>
+    <packaging>apklib</packaging>
 
-  <name>baracus-framework</name>
-  <description>The BARACUS Framework for lightweight DI, ORM and other cool stuff for Your Android application</description>
-  <url>http://maven.apache.org</url>
+    <name>baracus-framework</name>
+    <description>The BARACUS Framework for lightweight DI, ORM and other cool stuff for Your Android application
+    </description>
+    <url>http://maven.apache.org</url>
 
-  <properties>
-     <platform.version>4.0.1.2</platform.version>
-  </properties>
+    <properties>
+        <platform.version>4.0.1.2</platform.version>
+    </properties>
 
 
     <licenses>
@@ -24,71 +25,90 @@
         </license>
     </licenses>
 
-  <dependencies>
-      <dependency>
-          <groupId>com.google.android</groupId>
-          <artifactId>android</artifactId>
-          <version>${platform.version}</version>
-          <scope>provided</scope>
-      </dependency>
-      <dependency>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-          <version>4.10</version>
-          <scope>test</scope>
-      </dependency>
-  </dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>com.google.android</groupId>
+            <artifactId>android</artifactId>
+            <version>${platform.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-  <build>
-      <plugins>
-          <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-source-plugin</artifactId>
-              <executions>
-                  <execution>
-                      <goals>
-                          <goal>jar</goal>
-                      </goals>
-                  </execution>
-              </executions>
-          </plugin>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-          <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-javadoc-plugin</artifactId>
-              <configuration>
-                  <outputDirectory>${project.build.directory}/javadoc</outputDirectory>
-                  <reportOutputDirectory>${project.build.directory}/javadoc</reportOutputDirectory>
-              </configuration>
-          </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/javadoc</outputDirectory>
+                    <reportOutputDirectory>${project.build.directory}/javadoc</reportOutputDirectory>
+                </configuration>
+            </plugin>
 
-              <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-resources-plugin</artifactId>
-                  <configuration>
-                      <outputDirectory>${docs.directory}/${project.version}</outputDirectory>
-                      <resources>
-                          <resource>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <outputDirectory>${docs.directory}/${project.version}</outputDirectory>
+                    <resources>
+                        <resource>
                             <directory>${project.build.directory}/javadoc/apidocs/</directory>
-                            <includes><include>**/*</include></includes>
-                          </resource>
-                      </resources>
-                  </configuration>
-                  <executions>
-                      <execution>
-                          <goals>
-                              <goal>copy-resources</goal>
-                          </goals>
-                          <phase>
-                              site
-                          </phase>
-                      </execution>
-                  </executions>
-              </plugin>
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                        </resource>
+                    </resources>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <phase>
+                            site
+                        </phase>
+                    </execution>
+                </executions>
+            </plugin>
 
-      </plugins>
+            <plugin>
+                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <artifactId>android-maven-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
+                    <assetsDirectory>${project.basedir}/assets</assetsDirectory>
+                    <resourceDirectory>${project.basedir}/res</resourceDirectory>
+                    <nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory>
+                    <sdk>
+                        <platform>14</platform>
+                    </sdk>
+                    <undeployBeforeDeploy>true</undeployBeforeDeploy>
+                </configuration>
+                <extensions>true</extensions>
+            </plugin>
 
-  </build>
+        </plugins>
+
+    </build>
 
     <profiles>
         <profile>

@@ -8,4 +8,4 @@ VERSION 0.5
 VERSION 0.6
 - Single Parameter String resolve function
 - moved from getManagedClass to constructor based solution carrying a final variable
-
+- made an APKLIB out of this project

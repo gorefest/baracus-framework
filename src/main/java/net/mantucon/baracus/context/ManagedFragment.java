@@ -1,6 +1,7 @@
 package net.mantucon.baracus.context;
 
 import android.app.Fragment;
+import android.view.View;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,8 +21,17 @@ import android.app.Fragment;
  */
 public abstract class ManagedFragment extends Fragment {
 
+    protected View view;
+
     public ManagedFragment() {
         BaracusApplicationContext.performInjectionsOn(this);
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (view != null) {
+            BaracusApplicationContext.unregisterErrorhandlersForView(this.view);
+        }
+    }
 }
