@@ -48,35 +48,31 @@ public class ErrorView extends TextView implements ErrorHandler {
         for (int i = 0; i < attributeSet.getAttributeCount(); ++i) {
             log.info("$1 -> $2 -> $3", attributeSet.getAttributeName(i), attributeSet.getAttributeValue(i), attributeSet.getPositionDescription());
             if ("displayMessageFor".equals(attributeSet.getAttributeName(i))) {
-                displayMessageFor = attributeSet.getAttributeResourceValue(i,-1);
+                this.displayMessageFor = attributeSet.getAttributeResourceValue(i,-1);
                 log.info("DISPLAY MESSAGE HAS BEEN SET TO $1", displayMessageFor);
+            }
+
+            if ("highlightTarget".equals(attributeSet.getAttributeName(i))) {
+                this.highlightTarget = "true".equals(attributeSet.getAttributeValue(i));
+                log.info("HIGHLIGHT TARGET HAS BEEN SET TO $1", highlightTarget);
             }
 
         }
         log.info("---------------------------------");
-
-//        this.displayMessageFor = attributeSet.getAttributeResourceValue("app","displayMessageFor",-1);
-//        this.displayMessageFor = attributeSet.getAttributeIntValue(R.styleable.ErrorView_displayMessageFor,-1);
-
-
-
-        this.highlightTarget = attributeSet.getAttributeBooleanValue(R.styleable.ErrorView_highlightTarget, false);
     }
 
+    /**
+     * @return the ID of the component, whose errors affect this item
+     */
     public int getDisplayMessageFor() {
         return displayMessageFor;
     }
 
-    public void setDisplayMessageFor(int displayMessageFor) {
-        this.displayMessageFor = displayMessageFor;
-    }
-
+    /**
+     * @return true, if the referenced display shall be highlighted in case of an error
+     */
     public Boolean getHighlightTarget() {
         return highlightTarget;
-    }
-
-    public void setHighlightTarget(Boolean highlightTarget) {
-        this.highlightTarget = highlightTarget;
     }
 
     @Override
@@ -88,7 +84,7 @@ public class ErrorView extends TextView implements ErrorHandler {
         if (highlightTarget && displayMessageFor != -1) {
             View target = view.findViewById(getIdToDisplayFor());
             originalColour = target.getDrawingCacheBackgroundColor();
-            target.setBackgroundColor(Color.argb(100, 50, 50, 50));
+            target.setBackgroundColor(Color.argb(100, 255, 100, 100));
         }
     }
 

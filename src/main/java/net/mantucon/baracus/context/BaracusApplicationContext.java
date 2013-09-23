@@ -82,11 +82,16 @@ public abstract class BaracusApplicationContext extends Application {
     private static boolean semaphore = false;
     private static int refCount = 0;
 
-    // Awareness Refs
+    // Awareness Refs, event handlers
     protected final static Map<Class<?>, DeleteAwareComponent> deleteListeners = new HashMap<Class<?>, DeleteAwareComponent>();
     protected final static Map<Class<?>, DataSetChangeAwareComponent> changeListener = new HashMap<Class<?>, DataSetChangeAwareComponent>();
     protected final static Map<Class<?>, Set<DataChangeAwareComponent>> dataListener = new HashMap<Class<?>, Set<DataChangeAwareComponent>>();
     protected final static Map<Class<? extends GenericEvent>, Set<GenericEventAwareComponent<? extends GenericEvent>>> eventConsumers = new HashMap<Class<? extends GenericEvent>, Set<GenericEventAwareComponent<? extends GenericEvent>>>();
+
+    // Error handlers
+    static Map<View, Map<Integer, Object[]>> errorMap = new HashMap<View, Map<Integer, Object[]>>();
+    public static volatile Map<Integer, ErrorHandler> registeredHandlers = new HashMap<Integer, ErrorHandler>();
+
 
 
     private static final Logger logger = new Logger(BaracusApplicationContext.class);
@@ -527,6 +532,13 @@ public abstract class BaracusApplicationContext extends Application {
         }
     }
 
+    /**
+     * resolve the passed name into a android resource ID, this means
+     * the number representation in R.id.
+     *
+     * @param name - the name of a view component (e.g. btnOk)
+     * @return the ID (eg -47236333)
+     */
     public static final int getResource(String name) {
         try {
             Field f = R.layout.class.getField(name);
@@ -537,10 +549,17 @@ public abstract class BaracusApplicationContext extends Application {
         }
     }
 
-    static Map<View, Map<Integer, Object[]>> errorMap = new HashMap<View, Map<Integer, Object[]>>();
-    public static volatile Map<Integer, ErrorHandler> registeredHandlers = new HashMap<Integer, ErrorHandler>();
-
-
+    /**
+     * adds an error with a specific error level to the passed view.
+     * If an implementation of ErrorHandler is registered for the affectedResource, the error
+     * will be automatically routed to that field
+     *
+     * @param container - the containing view of the resource
+     * @param affectedResource - the resource
+     * @param messageId - a message ID
+     * @param severity - the severity. can be used by the ErrorHandler.
+     * @param params - the parameters varags used to replace $1..$n tags in the message text
+     */
     public static void addErrorToView(View container, int affectedResource, int messageId, ErrorSeverity severity, String... params) {
         if (!errorMap.containsKey(container)) {
             errorMap.put(container, new HashMap<Integer, Object[]>());
@@ -570,6 +589,12 @@ public abstract class BaracusApplicationContext extends Application {
         assignment.put(id, values);
     }
 
+    /**
+     * let all errors impact on the passed view. All bound fields and error handlers
+     * associated with the passed will highlight any error.
+     *
+     * @param container - the containing view
+     */
     public static void applyErrorsOnView(View container) {
         if (!errorMap.containsKey(container)) {
             return;
@@ -592,6 +617,10 @@ public abstract class BaracusApplicationContext extends Application {
         }
     }
 
+    /**
+     * remove all errors from the passed view
+     * @param container - the view to clear
+     */
     public static void resetErrors(View container) {
         if (errorMap.containsKey(container)) {
             Map<Integer, Object[]> assignments = errorMap.get(container);
@@ -607,12 +636,24 @@ public abstract class BaracusApplicationContext extends Application {
         }
     }
 
+    /**
+     * register an error handler. an error handler normally is bound to another field in
+     * the view. The error is raised by attaching an error to the field (view) component
+     * bound to the errorHandler's idToDisplayFor-property
+     * @param errorHandler
+     */
     public static void registerErrorHandler(ErrorHandler errorHandler) {
         if (errorHandler.getIdToDisplayFor() != -1) {
             registeredHandlers.put(errorHandler.getIdToDisplayFor(), errorHandler);
         }
     }
 
+    /**
+     * unregister all error handlers for the passed field. If you use the
+     * net.mantucon.baracus.context.ManagedFragment component and set the View
+     *
+     * @param container
+     */
     public static void unregisterErrorhandlersForView(View container) {
         errorMap.remove(container);
     }
