@@ -378,8 +378,6 @@ public abstract class BaseDao<T extends AbstractModelBase>{
             if (localTransaction) {
                 txHandle.rollback();
             }
-        }finally {
-
         }
     }
 

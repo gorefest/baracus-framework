@@ -609,10 +609,10 @@ public abstract class BaracusApplicationContext extends Application {
 
         Map<Integer, Object[]> assignments = errorMap.get(container);
 
-        for (Integer key : assignments.keySet()) {
-            ErrorHandler errorHandler = (ErrorHandler) container.findViewById(key);
+        for (Map.Entry<Integer, Object[]> set: assignments.entrySet()) {
+            ErrorHandler errorHandler = (ErrorHandler) container.findViewById(set.getKey());
             if (errorHandler != null) {
-                Object[] params = assignments.get(key);
+                Object[] params = set.getValue();
                 if (params.length > 2) {
                     String[] strings =new String[params.length - 2];
                     for (int i = 0; i < params.length-2; ++i){
@@ -653,7 +653,7 @@ public abstract class BaracusApplicationContext extends Application {
             for (Integer key: assignments.keySet()) {
                 ErrorHandler errorHandler = (ErrorHandler) container.findViewById(key);
                 if (errorHandler != null) {
-                    Object[] params =assignments.get(key);
+                    // Object[] params =assignments.get(key);
                     errorHandler.reset(container);
                 }
             }
