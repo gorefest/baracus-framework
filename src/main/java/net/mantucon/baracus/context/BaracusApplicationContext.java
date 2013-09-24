@@ -14,6 +14,7 @@ import net.mantucon.baracus.errorhandling.ErrorSeverity;
 import net.mantucon.baracus.orm.AbstractModelBase;
 import net.mantucon.baracus.signalling.*;
 import net.mantucon.baracus.util.Logger;
+import sun.misc.MessageUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -109,6 +110,9 @@ public abstract class BaracusApplicationContext extends Application {
     private static String databasePath;
 
     public BaracusApplicationContext() {
+        if (__instance != null) {
+            throw new ContainerAlreadyStartedException();
+        }
         __instance = this;
         make();
     }
@@ -120,6 +124,9 @@ public abstract class BaracusApplicationContext extends Application {
         ContextNotYetCreatedException (String reason) {
             super(reason);
         }
+    }
+
+    public static class ContainerAlreadyStartedException extends RuntimeException {
     }
 
     /**
@@ -368,13 +375,13 @@ public abstract class BaracusApplicationContext extends Application {
             if (dataListener.containsKey(changedItem.getClass())) {
                 Set<DataChangeAwareComponent> dac = dataListener.get(changedItem.getClass());
                 if (dac != null && dac.size() > 0) {
-                    try {
-                        for (DataChangeAwareComponent component : dac) {
+                    for (DataChangeAwareComponent component : dac) {
+                        try {
                             component.onChange(changedItem);
+                        } catch (Exception e) {
+                            logger.error("Caught exception while emitting change set event", e);
+                            dac.remove(component);
                         }
-                    } catch (Exception e) {
-                        logger.error("Caught exception while emitting change set event", e);
-                        dac.remove(changedItem.getClass());
                     }
                 }
             }
@@ -603,11 +610,17 @@ public abstract class BaracusApplicationContext extends Application {
         Map<Integer, Object[]> assignments = errorMap.get(container);
 
         for (Integer key : assignments.keySet()) {
-            Object[] params = assignments.get(key);
             ErrorHandler errorHandler = (ErrorHandler) container.findViewById(key);
             if (errorHandler != null) {
+                Object[] params = assignments.get(key);
                 if (params.length > 2) {
-
+                    String[] strings =new String[params.length - 2];
+                    for (int i = 0; i < params.length-2; ++i){
+                        strings[i] = (String) params[i];
+                    }
+                    Integer msgId = (Integer) params[0];
+                    ErrorSeverity severity = (ErrorSeverity) params[1];
+                    errorHandler.handleError(container, msgId, severity, strings);
                 } else {
                     Integer msgId = (Integer) params[0];
                     ErrorSeverity severity = (ErrorSeverity) params[1];
@@ -618,6 +631,18 @@ public abstract class BaracusApplicationContext extends Application {
     }
 
     /**
+     * Determines, whether a view is sticked with errors
+     * @param v - the view to check
+     * @return true, if any bound errors to the view are found in the errorMap
+     */
+    public static boolean viewHasErrors(View v){
+        if (errorMap.containsKey(v)){
+            return errorMap.get(v).size() > 0;
+        }
+        return false;
+    }
+
+    /**
      * remove all errors from the passed view
      * @param container - the view to clear
      */
@@ -625,14 +650,15 @@ public abstract class BaracusApplicationContext extends Application {
         if (errorMap.containsKey(container)) {
             Map<Integer, Object[]> assignments = errorMap.get(container);
 
-            for (Integer key : assignments.keySet()) {
-                Object[] params = assignments.get(key);
+            for (Integer key: assignments.keySet()) {
                 ErrorHandler errorHandler = (ErrorHandler) container.findViewById(key);
                 if (errorHandler != null) {
+                    Object[] params =assignments.get(key);
                     errorHandler.reset(container);
                 }
             }
 
+            errorMap.put(container, new HashMap<Integer, Object[]>());
         }
     }
 

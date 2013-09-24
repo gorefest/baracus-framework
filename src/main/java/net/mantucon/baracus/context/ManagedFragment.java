@@ -28,7 +28,6 @@ public abstract class ManagedFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         if (view != null) { // if you use the automatic error routing extension, you MUST set the view
                             // when inflating the form. Notice, this is normally done in the
                             // onCreateView function. If You do not set the view field when inflating
@@ -37,5 +36,6 @@ public abstract class ManagedFragment extends Fragment {
                             // held in the application context bound to the containing view instance!
             BaracusApplicationContext.unregisterErrorhandlersForView(this.view);
         }
+        super.onDestroyView();
     }
 }
