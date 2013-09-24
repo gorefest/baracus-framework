@@ -90,8 +90,8 @@ public abstract class BaracusApplicationContext extends Application {
     protected final static Map<Class<? extends GenericEvent>, Set<GenericEventAwareComponent<? extends GenericEvent>>> eventConsumers = new HashMap<Class<? extends GenericEvent>, Set<GenericEventAwareComponent<? extends GenericEvent>>>();
 
     // Error handlers
-    static Map<View, Map<Integer, Object[]>> errorMap = new HashMap<View, Map<Integer, Object[]>>();
-    public static volatile Map<Integer, ErrorHandler> registeredHandlers = new HashMap<Integer, ErrorHandler>();
+    private static Map<View, Map<Integer, Object[]>> errorMap = new HashMap<View, Map<Integer, Object[]>>();
+    private static volatile Map<Integer, ErrorHandler> registeredHandlers = new HashMap<Integer, ErrorHandler>();
 
 
 
