@@ -137,8 +137,8 @@ public class FieldList {
 
     public List<Field> getFields() {
         if (dirty) {
-            Collections.sort(fields);
-            validate();
+//            Collections.sort(fields);
+//            validate();
             dirty = false;
         }
         return fields;
@@ -149,7 +149,7 @@ public class FieldList {
         for (Field f : fields) {
             if (i != f.fieldIndex) {
                 logger.warn("WARNING! $1's field $2 is placed at $3, but should be on $4",binder , f.fieldName, f.fieldIndex, i);
-                f.fieldIndex = i;
+//                f.fieldIndex = i;
             }
             ++i;
         }

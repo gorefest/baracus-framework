@@ -35,13 +35,5 @@ public interface ErrorHandler {
      */
     public void reset(View view) ;
 
-    /**
-     * @return the component Id of the error handler widget
-     */
-    public int getId();
 
-    /**
-     * @return the component id, of the referenced Id;
-     */
-    public int getIdToDisplayFor();
 }

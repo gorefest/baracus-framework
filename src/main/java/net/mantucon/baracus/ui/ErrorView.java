@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 import net.mantucon.baracus.R;
 import net.mantucon.baracus.context.BaracusApplicationContext;
+import net.mantucon.baracus.errorhandling.CustomErrorHandler;
 import net.mantucon.baracus.errorhandling.ErrorHandler;
 import net.mantucon.baracus.errorhandling.ErrorSeverity;
 import net.mantucon.baracus.util.Logger;
@@ -18,7 +19,7 @@ import net.mantucon.baracus.util.Logger;
  * Time: 07:54
  * To change this template use File | Settings | File Templates.
  */
-public class ErrorView extends TextView implements ErrorHandler {
+public class ErrorView extends TextView implements CustomErrorHandler {
 
     private int displayMessageFor;
     private boolean highlightTarget;
@@ -26,19 +27,19 @@ public class ErrorView extends TextView implements ErrorHandler {
 
     public ErrorView(Context context) {
         super(context);
-        BaracusApplicationContext.registerErrorHandler(this);
+        BaracusApplicationContext.registerCustomErrorHandler(this);
     }
 
     public ErrorView(Context context, AttributeSet attrs) {
         super(context, attrs);
         parseAttribs(attrs);
-        BaracusApplicationContext.registerErrorHandler(this);
+        BaracusApplicationContext.registerCustomErrorHandler(this);
     }
 
     public ErrorView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         parseAttribs(attrs);
-        BaracusApplicationContext.registerErrorHandler(this);
+        BaracusApplicationContext.registerCustomErrorHandler(this);
     }
 
     private void parseAttribs(AttributeSet attributeSet) {

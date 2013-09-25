@@ -4,7 +4,7 @@
 
     <groupId>net.mantucon.baracus</groupId>
     <artifactId>baracus-framework</artifactId>
-    <version>0.6-SNAPSHOT</version>
+    <version>0.6.2-SNAPSHOT</version>
     <packaging>apklib</packaging>
 
     <name>baracus-framework</name>

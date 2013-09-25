@@ -14,7 +14,7 @@ public class Field implements Comparable<Field> {
     /**
      * field index, increment by one per field, set default to AbstractModelBase.fieldList.size() , see AbstractModelBase example for details
      */
-    public int fieldIndex;
+    public final int fieldIndex;
     /**
      * the name of the field in the db
      */
@@ -38,16 +38,6 @@ public class Field implements Comparable<Field> {
         isKeyAttribute = false;
     }
 
-    /**
-     * Constructor for regular fields. Assumes, that your field is not part of the key.
-     *
-     * @param fieldName - db name of the field
-     */
-    public Field(String fieldName) {
-        this.fieldName = fieldName;
-        this.fieldIndex = -1; // rely on validation to set the parameter index correctly
-        isKeyAttribute = false;
-    }
 
     /**
      * Constructor carrying a key information. normally the other constructor should fit your purpose.

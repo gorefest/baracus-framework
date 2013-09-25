@@ -4,4 +4,9 @@
         <attr name="displayMessageFor" format="reference" />
         <attr name="highlightTarget" format="boolean"/>
     </declare-styleable>
+
+    <declare-styleable name="ConstrainedEditText">
+       <attr name="validatedBy" format="string"/>
+    </declare-styleable>
+
 </resources>

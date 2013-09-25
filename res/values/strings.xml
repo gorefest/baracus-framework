@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notNullField">This field must not be empty</string>
+    <string name="notAIntegerField">$1 is not an integer </string>
+    <string name="notADecimalField">$1 is not a decimal number</string>
+</resources>

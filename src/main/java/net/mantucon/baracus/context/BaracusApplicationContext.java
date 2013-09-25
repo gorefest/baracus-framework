@@ -7,18 +7,25 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 import net.mantucon.baracus.dao.BaracusOpenHelper;
 import net.mantucon.baracus.dao.ConfigurationDao;
-import net.mantucon.baracus.errorhandling.ErrorHandler;
+import net.mantucon.baracus.errorhandling.CustomErrorHandler;
+import net.mantucon.baracus.errorhandling.ErrorHandlingFactory;
 import net.mantucon.baracus.errorhandling.ErrorSeverity;
+import net.mantucon.baracus.errorhandling.StandardErrorHandler;
 import net.mantucon.baracus.orm.AbstractModelBase;
 import net.mantucon.baracus.signalling.*;
 import net.mantucon.baracus.util.Logger;
+import net.mantucon.baracus.validation.ValidationFactory;
+import net.mantucon.baracus.validation.Validator;
 import sun.misc.MessageUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+
+import static net.mantucon.baracus.util.StringUtil.join;
 
 /**
  * Created with IntelliJ IDEA.  <br>
@@ -89,12 +96,6 @@ public abstract class BaracusApplicationContext extends Application {
     protected final static Map<Class<?>, Set<DataChangeAwareComponent>> dataListener = new HashMap<Class<?>, Set<DataChangeAwareComponent>>();
     protected final static Map<Class<? extends GenericEvent>, Set<GenericEventAwareComponent<? extends GenericEvent>>> eventConsumers = new HashMap<Class<? extends GenericEvent>, Set<GenericEventAwareComponent<? extends GenericEvent>>>();
 
-    // Error handlers
-    private static Map<View, Map<Integer, Object[]>> errorMap = new HashMap<View, Map<Integer, Object[]>>();
-    private static volatile Map<Integer, ErrorHandler> registeredHandlers = new HashMap<Integer, ErrorHandler>();
-
-
-
     private static final Logger logger = new Logger(BaracusApplicationContext.class);
 
     private static volatile BaracusApplicationContext __instance = null;
@@ -103,8 +104,14 @@ public abstract class BaracusApplicationContext extends Application {
 
     private static final BeanContainer beanContainer = new BeanContainer();
 
+    private static ValidationFactory validationFactory;
+    private static ErrorHandlingFactory errorHandlingFactory;
+
+
     static{
         registerBeanClass(ConfigurationDao.class);
+        registerBeanClass(ValidationFactory.class);
+        registerBeanClass(ErrorHandlingFactory.class);
     }
 
     private static String databasePath;
@@ -146,6 +153,9 @@ public abstract class BaracusApplicationContext extends Application {
             beanContainer.performInjections();
             beanContainer.performPostConstuct();
             beanContainer.treatKnownUiComponents();
+
+            validationFactory = getBean(ValidationFactory.class);
+            errorHandlingFactory = getBean(ErrorHandlingFactory.class);
 
             init = true;
         }
@@ -283,7 +293,11 @@ public abstract class BaracusApplicationContext extends Application {
             connectDbHandle().close();
             deleteListeners.clear();
             changeListener.clear();
+
             db = null;
+            validationFactory = null;
+            errorHandlingFactory = null;
+
             semaphore = false;
             init = false;
             System.gc();
@@ -493,6 +507,124 @@ public abstract class BaracusApplicationContext extends Application {
     }
 
     /**
+     * register a named validator for performing field validation in forms.
+     *
+     * @param name - the name of the validator
+     * @param validator - the validator instance
+     */
+    public static synchronized void registerValidator(String name, Validator<?> validator) {
+        validationFactory.registerValidator(name, validator);
+    }
+
+    /**
+     * register a named validator using the simple class name (FooBarValidator -> fooBarValidator)
+     * @param validator - the validator instance
+     */
+    public static void registerValidator(Validator<?> validator) {
+        validationFactory.registerValidator(validator);
+    }
+
+    /**
+     * make sure, that all named validators put into the comma seperated list are available
+     * inside the context
+     *
+     * @param validatorList
+     */
+    public static synchronized void verifyValidators(String validatorList) {
+        validationFactory.verifyValidators(validatorList);
+    }
+
+    /**
+     * perform validations on the passed view and apply all errors to the
+     * view. use viewHasErrors() to ask, if there are any issues bound to the
+     * view
+     *
+     * @param view - the view to process
+     */
+    public static synchronized void validateView(View view) {
+        validationFactory.validateView(view);
+        errorHandlingFactory.applyErrorsOnView(view);
+    }
+
+    /**
+     * register a custom error handler. Use this stuff only, if You want to use specific view components
+     * to handle Your errors, if you want to use standard android handling for any component,
+     * use the registerStandardErrorHandler() function instead!
+     * @param handler - the handler instance
+     */
+    public static synchronized void registerCustomErrorHandler(CustomErrorHandler handler) {
+        errorHandlingFactory.registerCustomErrorHandler(handler);
+    }
+
+    /**
+     * register a standard error handler. Using a standard error handler will make use
+     * of the android standard error handling.
+     *
+     * @param handler - the handler instance
+     */
+    public static synchronized void registerStandardErrorHandler(StandardErrorHandler handler) {
+        errorHandlingFactory.registerStandardErrorHandler(handler);
+    }
+
+
+    /**
+     * return true, if the passed view instance contains errors. Error handling should be always
+     * done on the root view of a form!
+     *
+     * @param container - the form view containing malicious components
+     * @return true, if any error is bound to the form instance
+     */
+    public static boolean viewHasErrors(View container) {
+        return errorHandlingFactory.viewHasErrors(container);
+    }
+
+    /**
+     * map all bound errors to all findeable receivers on the container.
+     * @param container - the container to map errors for
+     */
+    public static void applyErrorsOnView(View container) {
+        errorHandlingFactory.applyErrorsOnView(container);
+    }
+
+    /**
+     * adds an error to the passed view. use this function only, if want to perform manual form
+     * validation! if you rely on automatic validation and error routing, simply call validateView
+     *
+     * @param container - the container view
+     * @param affectedResource - the resource id of the component, where the error occured
+     * @param messageId - the message id to display
+     * @param severity - the severity of the problem (currently unused)
+     * @param params - the parameters to be mapped to the resource resolution
+     */
+    public static void addErrorToView(View container, int affectedResource, int messageId, ErrorSeverity severity, String... params) {
+        errorHandlingFactory.addErrorToView(container, affectedResource, messageId, severity, params);
+    }
+
+    /**
+     * clear all errors of the view container
+     *
+     * @param container - the container
+     */
+    public static void resetErrors(View container) {
+        errorHandlingFactory.resetErrors(container);
+    }
+
+    /**
+     * unregister all error handlers for a view. this should be called implicitly by the
+     * @see ManagedFragment and the
+     * @see ManagedActivity class
+     *
+     * If you are using own extension, make sure that you call this function before destroying
+     * the view in order to avoid memory leaks
+     *
+     * @param v
+     */
+    public static void unregisterErrorhandlersForView(View v)  {
+        errorHandlingFactory.unregisterCustomErrorHandlersForView(v);
+    }
+
+
+    /**
      * returns the baracus application context instance. notice,
      * normally you should not need this instance and fully rely
      * on the automated injection mechanisms
@@ -554,133 +686,5 @@ public abstract class BaracusApplicationContext extends Application {
             logger.error("ERROR!", e);
             throw new BadResourceAccessException(e);
         }
-    }
-
-    /**
-     * adds an error with a specific error level to the passed view.
-     * If an implementation of ErrorHandler is registered for the affectedResource, the error
-     * will be automatically routed to that field
-     *
-     * @param container - the containing view of the resource
-     * @param affectedResource - the resource
-     * @param messageId - a message ID
-     * @param severity - the severity. can be used by the ErrorHandler.
-     * @param params - the parameters varags used to replace $1..$n tags in the message text
-     */
-    public static void addErrorToView(View container, int affectedResource, int messageId, ErrorSeverity severity, String... params) {
-        if (!errorMap.containsKey(container)) {
-            errorMap.put(container, new HashMap<Integer, Object[]>());
-        }
-
-        Map<Integer, Object[]> assignment = errorMap.get(container);
-        Object[] values = new Object[params != null ? params.length + 2 : 2];
-
-        int id = -1;
-        if (registeredHandlers.containsKey(affectedResource)) {
-            id = registeredHandlers.get(affectedResource).getId();
-        } else {
-            id = affectedResource;
-        }
-
-        values[0] = Integer.valueOf(messageId);
-        values[1] = severity;
-
-        if (params != null && params.length > 0) {
-            int i = 2;
-            for (String param : params) {
-                values[i] = param;
-                i++;
-            }
-        }
-
-        assignment.put(id, values);
-    }
-
-    /**
-     * let all errors impact on the passed view. All bound fields and error handlers
-     * associated with the passed will highlight any error.
-     *
-     * @param container - the containing view
-     */
-    public static void applyErrorsOnView(View container) {
-        if (!errorMap.containsKey(container)) {
-            return;
-        }
-
-        Map<Integer, Object[]> assignments = errorMap.get(container);
-
-        for (Map.Entry<Integer, Object[]> set: assignments.entrySet()) {
-            ErrorHandler errorHandler = (ErrorHandler) container.findViewById(set.getKey());
-            if (errorHandler != null) {
-                Object[] params = set.getValue();
-                if (params.length > 2) {
-                    String[] strings =new String[params.length - 2];
-                    for (int i = 0; i < params.length-2; ++i){
-                        strings[i] = (String) params[i];
-                    }
-                    Integer msgId = (Integer) params[0];
-                    ErrorSeverity severity = (ErrorSeverity) params[1];
-                    errorHandler.handleError(container, msgId, severity, strings);
-                } else {
-                    Integer msgId = (Integer) params[0];
-                    ErrorSeverity severity = (ErrorSeverity) params[1];
-                    errorHandler.handleError(container, msgId, severity);
-                }
-            }
-        }
-    }
-
-    /**
-     * Determines, whether a view is sticked with errors
-     * @param v - the view to check
-     * @return true, if any bound errors to the view are found in the errorMap
-     */
-    public static boolean viewHasErrors(View v){
-        if (errorMap.containsKey(v)){
-            return errorMap.get(v).size() > 0;
-        }
-        return false;
-    }
-
-    /**
-     * remove all errors from the passed view
-     * @param container - the view to clear
-     */
-    public static void resetErrors(View container) {
-        if (errorMap.containsKey(container)) {
-            Map<Integer, Object[]> assignments = errorMap.get(container);
-
-            for (Integer key: assignments.keySet()) {
-                ErrorHandler errorHandler = (ErrorHandler) container.findViewById(key);
-                if (errorHandler != null) {
-                    // Object[] params =assignments.get(key);
-                    errorHandler.reset(container);
-                }
-            }
-
-            errorMap.put(container, new HashMap<Integer, Object[]>());
-        }
-    }
-
-    /**
-     * register an error handler. an error handler normally is bound to another field in
-     * the view. The error is raised by attaching an error to the field (view) component
-     * bound to the errorHandler's idToDisplayFor-property
-     * @param errorHandler
-     */
-    public static void registerErrorHandler(ErrorHandler errorHandler) {
-        if (errorHandler.getIdToDisplayFor() != -1) {
-            registeredHandlers.put(errorHandler.getIdToDisplayFor(), errorHandler);
-        }
-    }
-
-    /**
-     * unregister all error handlers for the passed field. If you use the
-     * net.mantucon.baracus.context.ManagedFragment component and set the View
-     *
-     * @param container
-     */
-    public static void unregisterErrorhandlersForView(View container) {
-        errorMap.remove(container);
     }
 }
