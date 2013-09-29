@@ -2,17 +2,13 @@ package net.mantucon.baracus.validation;
 
 import android.view.View;
 import android.view.ViewGroup;
-import net.mantucon.baracus.R;
 import net.mantucon.baracus.annotations.Bean;
-import net.mantucon.baracus.context.BaracusApplicationContext;
 import net.mantucon.baracus.errorhandling.ErrorHandlingFactory;
 import net.mantucon.baracus.errorhandling.ErrorSeverity;
 import net.mantucon.baracus.lifecycle.Destroyable;
 import net.mantucon.baracus.lifecycle.Initializeable;
 import net.mantucon.baracus.util.Logger;
-import net.mantucon.baracus.validation.builtins.StringIsNumericDouble;
-import net.mantucon.baracus.validation.builtins.StringIsNumericInteger;
-import net.mantucon.baracus.validation.builtins.StringNotEmpty;
+import net.mantucon.baracus.validation.builtins.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -140,6 +136,8 @@ public class ValidationFactory implements Initializeable, Destroyable{
         registerValidator(new StringNotEmpty());
         registerValidator(new StringIsNumericDouble());
         registerValidator(new StringIsNumericInteger());
+        registerValidator(new NumberMustBeGreaterThanZero());
+        registerValidator(new DateFromNow());
     }
 
     @Override

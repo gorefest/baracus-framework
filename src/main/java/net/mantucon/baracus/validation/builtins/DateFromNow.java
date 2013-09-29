@@ -1,13 +1,16 @@
 package net.mantucon.baracus.validation.builtins;
 
 
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.TextView;
 import net.mantucon.baracus.R;
 import net.mantucon.baracus.context.BaracusApplicationContext;
-import net.mantucon.baracus.errorhandling.ErrorSeverity;
+import net.mantucon.baracus.validation.AbstractValidator;
 import net.mantucon.baracus.validation.ConstrainedView;
-import net.mantucon.baracus.validation.Validator;
+
+import java.text.ParseException;
+import java.util.Date;
 
 import static net.mantucon.baracus.util.StringUtil.getString;
 import static net.mantucon.baracus.util.StringUtil.toArray;
@@ -17,29 +20,34 @@ import static net.mantucon.baracus.util.StringUtil.toArray;
  * User: marcus
  * Date: 24.09.13
  * Time: 08:47
- * return true, if a string as a numeric double. empty or null strings
- * will also return true
+ *
+ * verifies that the passed String is a number greater than zero
+ *
  */
-public class StringIsNumericDouble implements Validator<String> {
+public class DateFromNow extends AbstractValidator<String>{
 
     @Override
     public boolean validate(ConstrainedView<String> view) {
         String value = view.getCurrentValue();
         if (value != null || value.toString().trim().length() != 0)  {
-            View v = (View) view;
-            String s = value.toString().trim();
+            java.text.DateFormat df = DateFormat.getDateFormat(BaracusApplicationContext.getContext());
             try {
-                Double i = Double.parseDouble(s);
-            } catch (Exception e) {
-                return false;
+                Date d = df.parse(value);
+                return new Date().getTime() <= d.getTime();
+            } catch (ParseException e) {
+                return false; //unparseable
             }
+
+
+        } else {
+            return true; // empty string is ok, if you dont want empty strings, then lock the field with a StringNotEmpy constraint
         }
-        return true;
     }
+
 
     @Override
     public int getMessageId() {
-        return R.string.notADecimalField;
+        return R.string.numberIsSmallerThanZero;
     }
 
     public String[] viewToMessageParams(View v) {

@@ -114,6 +114,9 @@ public class FieldList {
         return fields.size();
     }
 
+    /**
+     * @return a string containing all field parameters as JDBC variables
+     */
     public String getParamsAsString() {
         StringBuilder sb = new StringBuilder();
         for (int i =  0; i < fields.size(); i++) {
@@ -124,6 +127,9 @@ public class FieldList {
         return result.substring(0,result.length() -1);
     }
 
+    /**
+     * @return a string containing all field parameters as JDBC variables except the key column
+     */
     public String getParamsAsStringWithoutKeyColumn() {
         StringBuilder sb = new StringBuilder();
         for (Field f : fields) {
@@ -137,7 +143,7 @@ public class FieldList {
 
     public List<Field> getFields() {
         if (dirty) {
-//            Collections.sort(fields);
+            Collections.sort(fields);
 //            validate();
             dirty = false;
         }

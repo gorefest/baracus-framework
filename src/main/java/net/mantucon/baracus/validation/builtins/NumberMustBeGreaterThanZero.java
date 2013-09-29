@@ -4,11 +4,11 @@ package net.mantucon.baracus.validation.builtins;
 import android.view.View;
 import android.widget.TextView;
 import net.mantucon.baracus.R;
-import net.mantucon.baracus.context.BaracusApplicationContext;
-import net.mantucon.baracus.errorhandling.ErrorSeverity;
+import net.mantucon.baracus.validation.AbstractValidator;
 import net.mantucon.baracus.validation.ConstrainedView;
 import net.mantucon.baracus.validation.Validator;
 
+import static net.mantucon.baracus.util.StringUtil.getDouble;
 import static net.mantucon.baracus.util.StringUtil.getString;
 import static net.mantucon.baracus.util.StringUtil.toArray;
 
@@ -17,29 +17,35 @@ import static net.mantucon.baracus.util.StringUtil.toArray;
  * User: marcus
  * Date: 24.09.13
  * Time: 08:47
- * return true, if a string as a numeric double. empty or null strings
- * will also return true
+ *
+ * verifies that the passed String is a number greater than zero
+ *
  */
-public class StringIsNumericDouble implements Validator<String> {
+public class NumberMustBeGreaterThanZero extends AbstractValidator<String>{
 
     @Override
     public boolean validate(ConstrainedView<String> view) {
         String value = view.getCurrentValue();
         if (value != null || value.toString().trim().length() != 0)  {
-            View v = (View) view;
-            String s = value.toString().trim();
             try {
-                Double i = Double.parseDouble(s);
-            } catch (Exception e) {
+                Integer i = Integer.valueOf(value);
+                return i > 0;
+            } catch (NumberFormatException exception) {
+                // null activity , try to parse a double out of the string
+            }
+            try {
+                Double d = Double.valueOf(value);
+                return d > 0;
+            } catch (NumberFormatException e) {
                 return false;
             }
         }
-        return true;
+        return false;
     }
 
     @Override
     public int getMessageId() {
-        return R.string.notADecimalField;
+        return R.string.numberIsSmallerThanZero;
     }
 
     public String[] viewToMessageParams(View v) {

@@ -17,7 +17,10 @@ import static net.mantucon.baracus.util.StringUtil.*;
  * User: marcus
  * Date: 24.09.13
  * Time: 08:47
- * To change this template use File | Settings | File Templates.
+ *
+ * return true, if a string as a numeric integer. empty or null strings
+ * will also return true
+ *
  */
 public class StringIsNumericInteger implements Validator<String> {
 

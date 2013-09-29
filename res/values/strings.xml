@@ -3,4 +3,5 @@
     <string name="notNullField">This field must not be empty</string>
     <string name="notAIntegerField">$1 is not an integer </string>
     <string name="notADecimalField">$1 is not a decimal number</string>
+    <string name="numberIsSmallerThanZero">Number must be greater than zero</string>
 </resources>
