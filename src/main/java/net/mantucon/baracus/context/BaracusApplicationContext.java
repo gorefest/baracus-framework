@@ -535,13 +535,15 @@ public abstract class BaracusApplicationContext extends Application {
     }
 
     /**
-     * perform validations on the passed view and apply all errors to the
+     * removes all errors from the view set before and then performs
+     * validations on the passed view and applies all errors to the
      * view. use viewHasErrors() to ask, if there are any issues bound to the
      * view
      *
      * @param view - the view to process
      */
     public static synchronized void validateView(View view) {
+        resetErrors(view);
         validationFactory.validateView(view);
         errorHandlingFactory.applyErrorsOnView(view);
     }

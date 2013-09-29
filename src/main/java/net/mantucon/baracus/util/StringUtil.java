@@ -1,6 +1,10 @@
 package net.mantucon.baracus.util;
 
+import android.text.format.DateFormat;
 import android.widget.TextView;
+import net.mantucon.baracus.context.BaracusApplicationContext;
+
+import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -75,12 +79,26 @@ public class StringUtil {
         return result;
     }
 
+    /**
+     * make a one-sized array out of the passed string
+     * @param input - the string
+     * @return an array sized 1 containing the string
+     */
     public static String[] toArray(String input) {
-        String[] result = new String[1];
-        result[1] = input;
-        return result;
+        if (input != null && input.length() > 0) {
+            String[] result = new String[1];
+            result[0] = input;
+            return result;
+        } else {
+            return new String[0];
+        }
     }
 
+    /**
+     * make a comma seperated string out a passed list/set of strings
+     * @param strings - the string collection
+     * @return the comma seperated string
+     */
     public static String join(Iterable<String> strings) {
         StringBuilder builder = new StringBuilder();
         for (String s : strings){
@@ -90,6 +108,12 @@ public class StringUtil {
         return result.substring(1, result.length()-2);
     }
 
+    /**
+     * split a string into an array and trim the strings
+     * @param s - the string to split
+     * @param delim - the delimiter
+     * @return - the array containing all strings trimmed
+     */
     public static String[] splitPurified(String s, String delim) {
         String[] result = null;
         if (s != null && s.length() > 0) {
@@ -102,6 +126,15 @@ public class StringUtil {
             }
         }
         return result;
+    }
+
+    /**
+     * formats a date to a string using the system's defined dateformat
+     * @param date - the date
+     * @return a String containing the formatted date
+     */
+    public static String formatDate(Date date) {
+        return DateFormat.getDateFormat(BaracusApplicationContext.getContext()).format(date);
     }
 
 }

@@ -115,7 +115,7 @@ public class ErrorHandlingFactory implements Initializeable, Destroyable{
                         if (params.length > 2) {
                             String[] strings =new String[params.length - 2];
                             for (int i = 0; i < params.length-2; ++i){
-                                strings[i] = (String) params[i];
+                                strings[i] = String.valueOf(params[i]);
                             }
                             handler.handleError(v,msgId, severity, strings);
                         } else {

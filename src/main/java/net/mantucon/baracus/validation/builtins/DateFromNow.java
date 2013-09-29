@@ -47,7 +47,7 @@ public class DateFromNow extends AbstractValidator<String>{
 
     @Override
     public int getMessageId() {
-        return R.string.numberIsSmallerThanZero;
+        return R.string.dateFromNow;
     }
 
     public String[] viewToMessageParams(View v) {

@@ -99,11 +99,16 @@ public class ValidationFactory implements Initializeable, Destroyable{
             ConstrainedView cv = (ConstrainedView) v;
             String[] validators = splitPurified(cv.getValidators(), ",");
             if (validators != null && validators.length > 0) {
-                for (String validatorName : validators) {
+                boolean stop = false;
+                int i = 0;
+                while (!stop) {
+                    String validatorName = validators[i++];
                     Validator validator = namedValidators.get(validatorName);
                     if (validator != null && !validator.validate(cv)) {
                         errorHandlingFactory.addErrorToView(root, v.getId(), validator.getMessageId(), ErrorSeverity.ERROR, validator.viewToMessageParams(v));
+                        stop = true;
                     }
+                    stop |= (i >= validators.length);
                 }
             }
         }

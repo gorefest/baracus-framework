@@ -4,4 +4,6 @@
     <string name="notAIntegerField">$1 is not an integer </string>
     <string name="notADecimalField">$1 is not a decimal number</string>
     <string name="numberIsSmallerThanZero">Number must be greater than zero</string>
+    <string name="dateFromNow">The date must not be before today</string>
+
 </resources>
