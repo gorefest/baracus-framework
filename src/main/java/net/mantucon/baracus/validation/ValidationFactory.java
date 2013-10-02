@@ -3,6 +3,7 @@ package net.mantucon.baracus.validation;
 import android.view.View;
 import android.view.ViewGroup;
 import net.mantucon.baracus.annotations.Bean;
+import net.mantucon.baracus.context.BaracusApplicationContext;
 import net.mantucon.baracus.errorhandling.ErrorHandlingFactory;
 import net.mantucon.baracus.errorhandling.ErrorSeverity;
 import net.mantucon.baracus.lifecycle.Destroyable;
@@ -150,5 +151,50 @@ public class ValidationFactory implements Initializeable, Destroyable{
         namedValidators.clear();
     }
 
+
+    /**
+     * walkt the view tree in order to find components to register
+     *
+     * @param root
+     * @param v
+     */
+    protected void registerValidationListener(final View root, final View v) {
+        if (ConstrainedView.class.isAssignableFrom(v.getClass())) {
+            v.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    BaracusApplicationContext.validateView(root);
+                    if (ValidatableView.class.isAssignableFrom(root.getClass())) {
+                        ValidatableView validatableView = (ValidatableView) root;
+                        validatableView.onValidation();
+                    }
+                }
+            });
+        }
+
+        if (ViewGroup.class.isAssignableFrom(v.getClass())) {
+            ViewGroup viewGroup = (ViewGroup) v;
+            for (int i = 0; i < viewGroup.getChildCount(); i++ ) {
+                View nextChild = viewGroup.getChildAt(i);
+                if (nextChild != null) {
+                    registerValidationListener(root, nextChild);
+                }
+            }
+        }
+    }
+
+    /**
+     * registers an onFocusChangeListener to all view elements implementing
+     * the @see ConstrainedView interface to perform on-the-fly-validation.
+     * If you want Your View to be able to receive a validation callback
+     * - e.g. in order to manage the visibility of an OK-Button or sth. -
+     * Your View must implement the @see ValidatableView interface in
+     * order to receive a validation notification callbacks
+     *
+     * @param root - the view to perform validation on
+     */
+    public void registerValidationListener(final View root) {
+        registerValidationListener(root,root);
+    }
 
 }

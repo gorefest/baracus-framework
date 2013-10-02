@@ -549,6 +549,23 @@ public abstract class BaracusApplicationContext extends Application {
     }
 
     /**
+     * registers an onFocusChangeListener to all view elements implementing
+     * the @see ConstrainedView interface to perform on-the-fly-validation.
+     * If you want Your View to be able to receive a validation callback
+     * - e.g. in order to manage the visibility of an OK-Button or sth. -
+     * Your View must implement the @see ValidatableView interface in
+     * order to receive a validation notification callbacks.
+     *
+     * If you implement a @see ManagedFragment, simply call
+     * the enableFocusChangeBasedValidation() function in the onCreate-method
+     *
+     * @param view - the view to register
+     */
+    public static void registerValidationListener(View view) {
+        validationFactory.registerValidationListener(view);
+    }
+
+    /**
      * register a custom error handler. Use this stuff only, if You want to use specific view components
      * to handle Your errors, if you want to use standard android handling for any component,
      * use the registerStandardErrorHandler() function instead!

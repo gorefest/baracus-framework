@@ -2,6 +2,7 @@ package net.mantucon.baracus.context;
 
 import android.app.Fragment;
 import android.view.View;
+import android.widget.EditText;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,5 +38,20 @@ public abstract class ManagedFragment extends Fragment {
             BaracusApplicationContext.unregisterErrorhandlersForView(this.view);
         }
         super.onDestroyView();
+    }
+
+    /**
+     * enables the validation of the view onFocusChanged
+     * If you want Your View to
+     * be able to receive a validation callback - e.g. in order to manage the
+     * visibility of an OK-Button or sth. - Your View must implement
+     * the @see ValidatableView interface in order to receive a validation
+     * notification.
+     *
+     * Notice, You must set the underlying view instance to enable this feature!
+     *
+     */
+    public void enableFocusChangeBasedValidation() {
+        BaracusApplicationContext.registerValidationListener(this.view);
     }
 }

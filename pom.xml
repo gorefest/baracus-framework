@@ -13,7 +13,7 @@
     <url>http://maven.apache.org</url>
 
     <properties>
-        <platform.version>4.0.1.2</platform.version>
+        <platform.version>3.2</platform.version>
     </properties>
 
 
@@ -38,6 +38,20 @@
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.9.5</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.android</groupId>
+            <artifactId>android-test</artifactId>
+            <version>4.0.1.2</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>

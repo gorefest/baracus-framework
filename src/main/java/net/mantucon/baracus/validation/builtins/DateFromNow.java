@@ -12,6 +12,7 @@ import net.mantucon.baracus.validation.ConstrainedView;
 import java.text.ParseException;
 import java.util.Date;
 
+import static net.mantucon.baracus.util.DateUtil.today;
 import static net.mantucon.baracus.util.StringUtil.getString;
 import static net.mantucon.baracus.util.StringUtil.toArray;
 
@@ -33,7 +34,7 @@ public class DateFromNow extends AbstractValidator<String>{
             java.text.DateFormat df = DateFormat.getDateFormat(BaracusApplicationContext.getContext());
             try {
                 Date d = df.parse(value);
-                return new Date().getTime() <= d.getTime();
+                return today().getTime() <= d.getTime();
             } catch (ParseException e) {
                 return false; //unparseable
             }

@@ -4,6 +4,7 @@ import android.text.format.DateFormat;
 import android.widget.TextView;
 import net.mantucon.baracus.context.BaracusApplicationContext;
 
+import java.text.ParseException;
 import java.util.Date;
 
 /**
@@ -135,6 +136,15 @@ public class StringUtil {
      */
     public static String formatDate(Date date) {
         return DateFormat.getDateFormat(BaracusApplicationContext.getContext()).format(date);
+    }
+
+    /**
+     * reverts a date string back into a date usign the system's date format
+     * @param date - the date string
+     * @return the parsed date
+     */
+    public static Date parseDate(String date) {
+        return DateUtil.toDate(date);
     }
 
 }
