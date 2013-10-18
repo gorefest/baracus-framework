@@ -19,3 +19,4 @@ VERSION 0.6
 - removed re-ordering of fields, now you MUST statically index Your fields in the Your beans.
   !! The prior function was buggy !!
 
+VERSION 0.7
