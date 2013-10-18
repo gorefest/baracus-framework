@@ -11,6 +11,7 @@
         <option name="LIBRARY_PROJECT" value="true" />
         <option name="RUN_PROCESS_RESOURCES_MAVEN_TASK" value="false" />
         <includeAssetsFromLibraries>true</includeAssetsFromLibraries>
+        <option name="COMPILE_CUSTOM_GENERATED_SOURCES" value="false" />
       </configuration>
     </facet>
   </component>
@@ -44,7 +45,6 @@
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.10" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-all:1.9.5" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.google.android:android-test:4.0.1.2" level="project" />
   </component>
 </module>
 

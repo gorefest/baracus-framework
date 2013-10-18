@@ -9,7 +9,7 @@ VERSION 0.6
 - IMPORTANT: made an APKLIB out of this project. Use type "apklib" now in Your maven dependency!
 
 - added an unified error handling technique for view components (android style and ErrorView style)
-- added an automatic view validation technique
+- added an automatic view validation technique (ManagedFragment.enableFocusChangeBasedValidation())
 - added a generic validation technique for declarative validation of view components
 - moved from getManagedClass to constructor based solution carrying a final variable
 

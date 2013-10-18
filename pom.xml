@@ -4,7 +4,7 @@
 
     <groupId>net.mantucon.baracus</groupId>
     <artifactId>baracus-framework</artifactId>
-    <version>0.6.2-SNAPSHOT</version>
+    <version>0.6</version>
     <packaging>apklib</packaging>
 
     <name>baracus-framework</name>
@@ -13,7 +13,7 @@
     <url>http://maven.apache.org</url>
 
     <properties>
-        <platform.version>3.2</platform.version>
+        <platform.version>4.0.1.2</platform.version>
     </properties>
 
 
@@ -42,13 +42,6 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>1.9.5</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.android</groupId>
-            <artifactId>android-test</artifactId>
-            <version>4.0.1.2</version>
             <scope>test</scope>
         </dependency>
 
