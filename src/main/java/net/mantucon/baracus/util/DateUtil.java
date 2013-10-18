@@ -1,5 +1,8 @@
 package net.mantucon.baracus.util;
 
+import android.text.format.DateFormat;
+import net.mantucon.baracus.context.BaracusApplicationContext;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -26,9 +29,14 @@ public class DateUtil {
         }
     }
 
+    /**
+     * reverts a date string back into a date usign the system's date format
+     * @param date - the date string
+     * @return the parsed date
+     */
     public static Date toDate(String date) {
         try {
-            return new SimpleDateFormat("dd.MM.yyyy").parse(date);
+            return DateFormat.getDateFormat(BaracusApplicationContext.getContext()).parse(date);
         } catch (ParseException e) {
             throw new DateFormatException(e);
         }
@@ -57,6 +65,14 @@ public class DateUtil {
         return date != null ? new SimpleDateFormat("dd.MM.yyyy").format(date) : "";
     }
 
+    public static Date fromEuropeanDate(String date) {
+        try {
+            return date != null ? new SimpleDateFormat("dd.MM.yyyy").parse(date) : null;
+        } catch (ParseException e) {
+            throw new DateFormatException(e);
+        }
+    }
+
     public static String toReverseDate(Date date) {
         return date != null ?  new SimpleDateFormat("yyyyMMdd_hhmmss").format(date) : "";
     }
@@ -68,4 +84,12 @@ public class DateUtil {
         return cal.getTime();
 
     }
+
+    /**
+     * @return today's date
+     */
+    public static Date today() {
+        return fromEuropeanDate(toEuropeanDate(new Date()));
+    }
+
 }

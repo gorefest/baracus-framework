@@ -1,18 +1,31 @@
 package net.mantucon.baracus.context;
 
+import android.R;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 import net.mantucon.baracus.dao.BaracusOpenHelper;
 import net.mantucon.baracus.dao.ConfigurationDao;
+import net.mantucon.baracus.errorhandling.CustomErrorHandler;
+import net.mantucon.baracus.errorhandling.ErrorHandlingFactory;
+import net.mantucon.baracus.errorhandling.ErrorSeverity;
+import net.mantucon.baracus.errorhandling.StandardErrorHandler;
 import net.mantucon.baracus.orm.AbstractModelBase;
 import net.mantucon.baracus.signalling.*;
 import net.mantucon.baracus.util.Logger;
+import net.mantucon.baracus.validation.ValidationFactory;
+import net.mantucon.baracus.validation.Validator;
+import sun.misc.MessageUtils;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+
+import static net.mantucon.baracus.util.StringUtil.join;
 
 /**
  * Created with IntelliJ IDEA.  <br>
@@ -77,12 +90,11 @@ public abstract class BaracusApplicationContext extends Application {
     private static boolean semaphore = false;
     private static int refCount = 0;
 
-    // Awareness Refs
+    // Awareness Refs, event handlers
     protected final static Map<Class<?>, DeleteAwareComponent> deleteListeners = new HashMap<Class<?>, DeleteAwareComponent>();
     protected final static Map<Class<?>, DataSetChangeAwareComponent> changeListener = new HashMap<Class<?>, DataSetChangeAwareComponent>();
     protected final static Map<Class<?>, Set<DataChangeAwareComponent>> dataListener = new HashMap<Class<?>, Set<DataChangeAwareComponent>>();
     protected final static Map<Class<? extends GenericEvent>, Set<GenericEventAwareComponent<? extends GenericEvent>>> eventConsumers = new HashMap<Class<? extends GenericEvent>, Set<GenericEventAwareComponent<? extends GenericEvent>>>();
-
 
     private static final Logger logger = new Logger(BaracusApplicationContext.class);
 
@@ -92,13 +104,22 @@ public abstract class BaracusApplicationContext extends Application {
 
     private static final BeanContainer beanContainer = new BeanContainer();
 
+    private static ValidationFactory validationFactory;
+    private static ErrorHandlingFactory errorHandlingFactory;
+
+
     static{
         registerBeanClass(ConfigurationDao.class);
+        registerBeanClass(ValidationFactory.class);
+        registerBeanClass(ErrorHandlingFactory.class);
     }
 
     private static String databasePath;
 
     public BaracusApplicationContext() {
+        if (__instance != null) {
+            throw new ContainerAlreadyStartedException();
+        }
         __instance = this;
         make();
     }
@@ -112,6 +133,18 @@ public abstract class BaracusApplicationContext extends Application {
         }
     }
 
+    public static class ContainerAlreadyStartedException extends RuntimeException {
+    }
+
+    /**
+     * thrown, if a unlocateable resource is requested
+     */
+    private static final class BadResourceAccessException extends RuntimeException {
+        public BadResourceAccessException(Throwable throwable) {
+            super(throwable);
+        }
+    }
+
     private static boolean init=false;
     public static synchronized void initApplicationContext() {
         if (!init) {
@@ -120,6 +153,9 @@ public abstract class BaracusApplicationContext extends Application {
             beanContainer.performInjections();
             beanContainer.performPostConstuct();
             beanContainer.treatKnownUiComponents();
+
+            validationFactory = getBean(ValidationFactory.class);
+            errorHandlingFactory = getBean(ErrorHandlingFactory.class);
 
             init = true;
         }
@@ -226,6 +262,21 @@ public abstract class BaracusApplicationContext extends Application {
     }
 
     /**
+     * resolve a string and replace parameters by passed strings
+     * e.g. resolveString(R.string.foo,4711)
+     * single parameter function to avoid array wrapping in case of single parameters
+     *
+     * @param msgId - the android string resource id
+     * @param var - the variables replacing $1,$2...$n in the string
+     * @return the substituted string
+     */
+    public static String resolveString(Integer msgId, String var) {
+        String rawMsg = __instance.getApplicationContext().getString(msgId);
+        rawMsg = rawMsg.replace("$1", var);
+        return rawMsg;
+    }
+
+    /**
      * destroys the application context and shreds all beans. this function allows you
      * to shut down the entire bean context in your application without restarting it
      *
@@ -242,7 +293,11 @@ public abstract class BaracusApplicationContext extends Application {
             connectDbHandle().close();
             deleteListeners.clear();
             changeListener.clear();
+
             db = null;
+            validationFactory = null;
+            errorHandlingFactory = null;
+
             semaphore = false;
             init = false;
             System.gc();
@@ -334,13 +389,13 @@ public abstract class BaracusApplicationContext extends Application {
             if (dataListener.containsKey(changedItem.getClass())) {
                 Set<DataChangeAwareComponent> dac = dataListener.get(changedItem.getClass());
                 if (dac != null && dac.size() > 0) {
-                    try {
-                        for (DataChangeAwareComponent component : dac) {
+                    for (DataChangeAwareComponent component : dac) {
+                        try {
                             component.onChange(changedItem);
+                        } catch (Exception e) {
+                            logger.error("Caught exception while emitting change set event", e);
+                            dac.remove(component);
                         }
-                    } catch (Exception e) {
-                        logger.error("Caught exception while emitting change set event", e);
-                        dac.remove(changedItem.getClass());
                     }
                 }
             }
@@ -373,6 +428,18 @@ public abstract class BaracusApplicationContext extends Application {
             set.clear();
         }
     }
+
+    /**
+     * Free all consumers of data change event
+     * @param forClazz - the model class whose event listeners should be removed
+     */
+    public static synchronized void freeDataChangeListeners(Class<? extends AbstractModelBase> forClazz){
+        Set<DataChangeAwareComponent> set = dataListener.get(forClazz);
+        if (set != null) {
+            set.clear();
+        }
+    }
+
 
 
     /**
@@ -440,6 +507,143 @@ public abstract class BaracusApplicationContext extends Application {
     }
 
     /**
+     * register a named validator for performing field validation in forms.
+     *
+     * @param name - the name of the validator
+     * @param validator - the validator instance
+     */
+    public static synchronized void registerValidator(String name, Validator<?> validator) {
+        validationFactory.registerValidator(name, validator);
+    }
+
+    /**
+     * register a named validator using the simple class name (FooBarValidator -> fooBarValidator)
+     * @param validator - the validator instance
+     */
+    public static void registerValidator(Validator<?> validator) {
+        validationFactory.registerValidator(validator);
+    }
+
+    /**
+     * make sure, that all named validators put into the comma seperated list are available
+     * inside the context
+     *
+     * @param validatorList
+     */
+    public static synchronized void verifyValidators(String validatorList) {
+        validationFactory.verifyValidators(validatorList);
+    }
+
+    /**
+     * removes all errors from the view set before and then performs
+     * validations on the passed view and applies all errors to the
+     * view. use viewHasErrors() to ask, if there are any issues bound to the
+     * view
+     *
+     * @param view - the view to process
+     */
+    public static synchronized void validateView(View view) {
+        resetErrors(view);
+        validationFactory.validateView(view);
+        errorHandlingFactory.applyErrorsOnView(view);
+    }
+
+    /**
+     * registers an onFocusChangeListener to all view elements implementing
+     * the @see ConstrainedView interface to perform on-the-fly-validation.
+     * If you want Your View to be able to receive a validation callback
+     * - e.g. in order to manage the visibility of an OK-Button or sth. -
+     * Your View must implement the @see ValidatableView interface in
+     * order to receive a validation notification callbacks.
+     *
+     * If you implement a @see ManagedFragment, simply call
+     * the enableFocusChangeBasedValidation() function in the onCreate-method
+     *
+     * @param view - the view to register
+     */
+    public static void registerValidationListener(View view) {
+        validationFactory.registerValidationListener(view);
+    }
+
+    /**
+     * register a custom error handler. Use this stuff only, if You want to use specific view components
+     * to handle Your errors, if you want to use standard android handling for any component,
+     * use the registerStandardErrorHandler() function instead!
+     * @param handler - the handler instance
+     */
+    public static synchronized void registerCustomErrorHandler(CustomErrorHandler handler) {
+        errorHandlingFactory.registerCustomErrorHandler(handler);
+    }
+
+    /**
+     * register a standard error handler. Using a standard error handler will make use
+     * of the android standard error handling.
+     *
+     * @param handler - the handler instance
+     */
+    public static synchronized void registerStandardErrorHandler(StandardErrorHandler handler) {
+        errorHandlingFactory.registerStandardErrorHandler(handler);
+    }
+
+
+    /**
+     * return true, if the passed view instance contains errors. Error handling should be always
+     * done on the root view of a form!
+     *
+     * @param container - the form view containing malicious components
+     * @return true, if any error is bound to the form instance
+     */
+    public static boolean viewHasErrors(View container) {
+        return errorHandlingFactory.viewHasErrors(container);
+    }
+
+    /**
+     * map all bound errors to all findeable receivers on the container.
+     * @param container - the container to map errors for
+     */
+    public static void applyErrorsOnView(View container) {
+        errorHandlingFactory.applyErrorsOnView(container);
+    }
+
+    /**
+     * adds an error to the passed view. use this function only, if want to perform manual form
+     * validation! if you rely on automatic validation and error routing, simply call validateView
+     *
+     * @param container - the container view
+     * @param affectedResource - the resource id of the component, where the error occured
+     * @param messageId - the message id to display
+     * @param severity - the severity of the problem (currently unused)
+     * @param params - the parameters to be mapped to the resource resolution
+     */
+    public static void addErrorToView(View container, int affectedResource, int messageId, ErrorSeverity severity, String... params) {
+        errorHandlingFactory.addErrorToView(container, affectedResource, messageId, severity, params);
+    }
+
+    /**
+     * clear all errors of the view container
+     *
+     * @param container - the container
+     */
+    public static void resetErrors(View container) {
+        errorHandlingFactory.resetErrors(container);
+    }
+
+    /**
+     * unregister all error handlers for a view. this should be called implicitly by the
+     * @see ManagedFragment and the
+     * @see ManagedActivity class
+     *
+     * If you are using own extension, make sure that you call this function before destroying
+     * the view in order to avoid memory leaks
+     *
+     * @param v
+     */
+    public static void unregisterErrorhandlersForView(View v)  {
+        errorHandlingFactory.unregisterCustomErrorHandlersForView(v);
+    }
+
+
+    /**
      * returns the baracus application context instance. notice,
      * normally you should not need this instance and fully rely
      * on the automated injection mechanisms
@@ -483,6 +687,23 @@ public abstract class BaracusApplicationContext extends Application {
             return instance;
         } catch (Exception e) {
             throw new Exceptions.IntantiationException(e);
+        }
+    }
+
+    /**
+     * resolve the passed name into a android resource ID, this means
+     * the number representation in R.id.
+     *
+     * @param name - the name of a view component (e.g. btnOk)
+     * @return the ID (eg -47236333)
+     */
+    public static final int getResource(String name) {
+        try {
+            Field f = R.layout.class.getField(name);
+            return f.getInt(null);
+        } catch (Exception e) {
+            logger.error("ERROR!", e);
+            throw new BadResourceAccessException(e);
         }
     }
 }

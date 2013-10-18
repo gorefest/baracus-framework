@@ -114,6 +114,9 @@ public class FieldList {
         return fields.size();
     }
 
+    /**
+     * @return a string containing all field parameters as JDBC variables
+     */
     public String getParamsAsString() {
         StringBuilder sb = new StringBuilder();
         for (int i =  0; i < fields.size(); i++) {
@@ -124,6 +127,9 @@ public class FieldList {
         return result.substring(0,result.length() -1);
     }
 
+    /**
+     * @return a string containing all field parameters as JDBC variables except the key column
+     */
     public String getParamsAsStringWithoutKeyColumn() {
         StringBuilder sb = new StringBuilder();
         for (Field f : fields) {
@@ -138,7 +144,7 @@ public class FieldList {
     public List<Field> getFields() {
         if (dirty) {
             Collections.sort(fields);
-            validate();
+//            validate();
             dirty = false;
         }
         return fields;
@@ -149,7 +155,7 @@ public class FieldList {
         for (Field f : fields) {
             if (i != f.fieldIndex) {
                 logger.warn("WARNING! $1's field $2 is placed at $3, but should be on $4",binder , f.fieldName, f.fieldIndex, i);
-                f.fieldIndex = i;
+//                f.fieldIndex = i;
             }
             ++i;
         }

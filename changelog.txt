@@ -4,3 +4,19 @@ VERSION 0.5
   in-application use
 - context now injecteable
 - Exceptions in context and bean handling reused
+
+VERSION 0.6
+- IMPORTANT: made an APKLIB out of this project. Use type "apklib" now in Your maven dependency!
+
+- added an unified error handling technique for view components (android style and ErrorView style)
+- added an automatic view validation technique (ManagedFragment.enableFocusChangeBasedValidation())
+- added a generic validation technique for declarative validation of view components
+- moved from getManagedClass to constructor based solution carrying a final variable
+
+- Single Parameter String resolve function
+- some minor bugfixes and improvements on the application context
+- StringUtil for easier TextView handling
+- removed re-ordering of fields, now you MUST statically index Your fields in the Your beans.
+  !! The prior function was buggy !!
+
+VERSION 0.7

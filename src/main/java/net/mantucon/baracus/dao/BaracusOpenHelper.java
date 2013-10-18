@@ -84,13 +84,13 @@ public abstract class BaracusOpenHelper extends SQLiteOpenHelper implements Dest
 
     protected static Map<Integer, MigrationStep> upgradeSteps = new HashMap<Integer, MigrationStep>();  // Here are the upgrade steps
 
-    protected final String databaseName;        // set this value via constructor in order to define the db name
+    private final String databaseName;        // set this value via constructor in order to define the db name
 
     /*  set this value via constructor in order to set the target version
         we are going to iterate all bound version migrators from initialVersion
         until target version
      */
-    protected final int targetDatabaseVersion;
+    private final int targetDatabaseVersion;
 
     static  {
         upgradeSteps.put(110, new ModelVersion000());

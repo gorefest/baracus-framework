@@ -1,6 +1,8 @@
 package net.mantucon.baracus.context;
 
 import android.app.Fragment;
+import android.view.View;
+import android.widget.EditText;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,13 +17,41 @@ import android.app.Fragment;
  * Simple inherit this class and register it as usual as a Fragment bean and all accesses
  * to injected beans will work fine :)
  *
- *
- *
  */
 public abstract class ManagedFragment extends Fragment {
+
+    // set this View from derived classes if You want to use automatic error handling
+    protected View view;
 
     public ManagedFragment() {
         BaracusApplicationContext.performInjectionsOn(this);
     }
 
+    @Override
+    public void onDestroyView() {
+        if (view != null) { // if you use the automatic error routing extension, you MUST set the view
+                            // when inflating the form. Notice, this is normally done in the
+                            // onCreateView function. If You do not set the view field when inflating
+                            // a new view, you will create memory leaks, because all bound errorHandlers
+                            // cannot be marked for removal by the garbage collector because they are
+                            // held in the application context bound to the containing view instance!
+            BaracusApplicationContext.unregisterErrorhandlersForView(this.view);
+        }
+        super.onDestroyView();
+    }
+
+    /**
+     * enables the validation of the view onFocusChanged
+     * If you want Your View to
+     * be able to receive a validation callback - e.g. in order to manage the
+     * visibility of an OK-Button or sth. - Your View must implement
+     * the @see ValidatableView interface in order to receive a validation
+     * notification.
+     *
+     * Notice, You must set the underlying view instance to enable this feature!
+     *
+     */
+    public void enableFocusChangeBasedValidation() {
+        BaracusApplicationContext.registerValidationListener(this.view);
+    }
 }

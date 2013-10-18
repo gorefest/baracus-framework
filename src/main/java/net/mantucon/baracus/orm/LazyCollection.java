@@ -25,7 +25,7 @@ public class LazyCollection<T> implements List<T> {
     }
 
 
-    private enum CollectionState {
+    private static enum CollectionState {
         Armed,
         Loaded
     }
@@ -54,8 +54,8 @@ public class LazyCollection<T> implements List<T> {
      *
      */
     private void checkReferencedData() {
+        synchronized (collectionState) {
         if (collectionState == CollectionState.Armed) {
-            synchronized (this) {
                 collectionState = CollectionState.Loaded;
                 referencedData.addAll(lazyLoader.loadReference());
             }
