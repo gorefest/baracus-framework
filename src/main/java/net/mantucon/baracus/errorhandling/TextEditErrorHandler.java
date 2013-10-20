@@ -4,6 +4,9 @@ import android.view.View;
 import android.widget.TextView;
 import net.mantucon.baracus.context.BaracusApplicationContext;
 
+import static net.mantucon.baracus.util.StringUtil.getString;
+import static net.mantucon.baracus.util.StringUtil.toArray;
+
 /**
  * Created with IntelliJ IDEA.
  * User: marcus
@@ -27,14 +30,27 @@ public class TextEditErrorHandler implements StandardErrorHandler {
     public void handleError(View view, int errorMessageId, ErrorSeverity severity, String... params) {
         // This function applies the error message to the passed text view
         String message = BaracusApplicationContext.resolveString(errorMessageId, params);
-        TextView v  = (TextView) view;
-        v.setError(message);
+        if (view != null) {
+            if (TextView.class.isAssignableFrom(view.getClass())) {
+                TextView v  = (TextView) view;
+                v.setError(message);
+            } else {
+                throw new IllegalArgumentException("Not the correct type. This validator requires a Text View but got "+view.getClass().getName());
+            }
+        };
+
     }
 
     @Override
     public void reset(View view) {
         // This function removes the error message from the passed view
-        TextView v  = (TextView) view;
-        v.setError(null);
+        if (view != null) {
+            if (TextView.class.isAssignableFrom(view.getClass())) {
+                TextView v  = (TextView) view;
+                v.setError(null);
+            } else {
+                throw new IllegalArgumentException("Not the correct type. This validator requires a Text View but got "+view.getClass().getName());
+            }
+        };
     }
 }
