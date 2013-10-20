@@ -42,7 +42,13 @@ public class StringIsNumericDouble implements Validator<String> {
     }
 
     public String[] viewToMessageParams(View v) {
-        return toArray(getString((TextView) v));
+        if (v != null) {
+            if (TextView.class.isAssignableFrom(v.getClass())) {
+                return toArray(getString((TextView) v));
+            } else {
+                throw new IllegalArgumentException("Not the correct type. This validator requires a Text View but got "+v.getClass().getName());
+            }
+        } else return null;
     }
 
 
