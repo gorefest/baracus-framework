@@ -30,7 +30,7 @@ public class DateFromNow extends AbstractValidator<String>{
     @Override
     public boolean validate(ConstrainedView<String> view) {
         String value = view.getCurrentValue();
-        if (value != null || value.toString().trim().length() != 0)  {
+        if (value != null && value.toString().trim().length() != 0)  {
             java.text.DateFormat df = DateFormat.getDateFormat(BaracusApplicationContext.getContext());
             try {
                 Date d = df.parse(value);

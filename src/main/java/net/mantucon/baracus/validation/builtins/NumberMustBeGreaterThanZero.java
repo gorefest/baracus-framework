@@ -26,7 +26,7 @@ public class NumberMustBeGreaterThanZero extends AbstractValidator<String>{
     @Override
     public boolean validate(ConstrainedView<String> view) {
         String value = view.getCurrentValue();
-        if (value != null || value.toString().trim().length() != 0)  {
+        if (value != null && value.toString().trim().length() != 0)  {
             try {
                 Integer i = Integer.valueOf(value);
                 return i > 0;

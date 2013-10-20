@@ -27,11 +27,10 @@ public class StringIsNumericInteger implements Validator<String> {
     @Override
     public boolean validate(ConstrainedView<String> view) {
         String value = view.getCurrentValue();
-        if (value != null || value.toString().trim().length() != 0)  {
-            View v = (View) view;
+        if (value != null && value.toString().trim().length() != 0)  {
             String s = value.toString().trim();
             try {
-                Integer i = Integer.parseInt(s);
+                Integer.parseInt(s);
             } catch (Exception e) {
                 return false;
             }
