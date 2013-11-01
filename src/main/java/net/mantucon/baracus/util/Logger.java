@@ -264,11 +264,11 @@ public class Logger {
     }
 
 
-    private void logMessage(String message, Throwable t) {
+    private void logMessage(String message, Level level2log,  Throwable t) {
         if (message == null) {
             message = "null";
         }
-        switch (level) {
+        switch (level2log) {
             case TRACE:
                 if (t != null) {
                     logTarget.trace(TAG,message,t);
@@ -309,12 +309,12 @@ public class Logger {
 
     private void log(Level level, String message, Throwable e) {
          if (isLoggable(level)) {
-            logMessage(message, e);
+            logMessage(message,level, e);
          }
     }
     private void log(Level level, String message) {
         if (isLoggable(level)) {
-            logMessage(message, null);
+            logMessage(message, level,  null);
         }
     }
 

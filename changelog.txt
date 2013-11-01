@@ -1,9 +1,8 @@
-VERSION 0.5
 
-- prototype beans now supported. prototype beans are bean instances with DI that are no singleton for
-  in-application use
-- context now injecteable
-- Exceptions in context and bean handling reused
+VERSION 0.7
+
+- Bugfixes wrong logging (wrong logger level instead of output logging level)
+- Missing removal of data change listeners added
 
 VERSION 0.6
 - IMPORTANT: made an APKLIB out of this project. Use type "apklib" now in Your maven dependency!
@@ -19,4 +18,9 @@ VERSION 0.6
 - removed re-ordering of fields, now you MUST statically index Your fields in the Your beans.
   !! The prior function was buggy !!
 
-VERSION 0.7
+VERSION 0.5
+
+- prototype beans now supported. prototype beans are bean instances with DI that are no singleton for
+  in-application use
+- context now injecteable
+- Exceptions in context and bean handling reused

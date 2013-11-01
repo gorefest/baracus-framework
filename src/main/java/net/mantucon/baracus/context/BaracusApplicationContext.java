@@ -365,8 +365,8 @@ public abstract class BaracusApplicationContext extends Application {
      * register a change listener on the entity. @see registerDeleteListener. same restrictions, same behaviour
      * but this time for change events
      *
-     * @param clazz
-     * @param dac
+     * @param clazz - the model class, for which we want to listen for changes
+     * @param dac - the change listener instance
      */
     public static synchronized void registerDataChangeListener(Class<? extends AbstractModelBase> clazz, DataChangeAwareComponent dac) {
         logger.debug("Registered SetChangeListener $1 for class $2", clazz.getSimpleName(), dac.getClass().getSimpleName());
@@ -376,6 +376,19 @@ public abstract class BaracusApplicationContext extends Application {
             dataListener.put(clazz, set);
         }
         set.add(dac);
+    }
+
+    /**
+     * removes a data change listener instance explicitly from the map
+     *
+     * @param dac - the change listener instance
+     */
+    public static synchronized  void unregisterDataChangeListener(DataChangeAwareComponent<?> dac){
+        for ( Set<DataChangeAwareComponent> sets : dataListener.values()) {
+            if (sets.remove(dac)) {
+                logger.debug("DAC was successfully removed $1", dac);
+            }
+        }
     }
 
     /**
