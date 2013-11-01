@@ -88,21 +88,19 @@ public class ErrorHandlingFactory implements Initializeable, Destroyable{
             // technique
             if (v != null && CustomErrorHandler.class.isAssignableFrom(v.getClass())) {
                 ErrorHandler customErrorHandler= (ErrorHandler) v;
-                if (customErrorHandler != null) {
-                    Object[] params = set.getValue();
-                    if (params.length > 2) {
-                        String[] strings =new String[params.length - 2];
-                        for (int i = 0; i < params.length-2; ++i){
-                            strings[i] = (String) params[i];
-                        }
-                        Integer msgId = (Integer) params[0];
-                        ErrorSeverity severity = (ErrorSeverity) params[1];
-                        customErrorHandler.handleError(container, msgId, severity, strings);
-                    } else {
-                        Integer msgId = (Integer) params[0];
-                        ErrorSeverity severity = (ErrorSeverity) params[1];
-                        customErrorHandler.handleError(container, msgId, severity);
+                Object[] params = set.getValue();
+                if (params.length > 2) {
+                    String[] strings =new String[params.length - 2];
+                    for (int i = 0; i < params.length-2; ++i){
+                        strings[i] = (String) params[i];
                     }
+                    Integer msgId = (Integer) params[0];
+                    ErrorSeverity severity = (ErrorSeverity) params[1];
+                    customErrorHandler.handleError(container, msgId, severity, strings);
+                } else {
+                    Integer msgId = (Integer) params[0];
+                    ErrorSeverity severity = (ErrorSeverity) params[1];
+                    customErrorHandler.handleError(container, msgId, severity);
                 }
             } else {
                 // Now try all standard handlers

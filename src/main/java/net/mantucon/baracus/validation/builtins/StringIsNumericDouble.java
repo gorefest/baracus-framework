@@ -25,11 +25,10 @@ public class StringIsNumericDouble implements Validator<String> {
     @Override
     public boolean validate(ConstrainedView<String> view) {
         String value = view.getCurrentValue();
-        if (value != null || value.toString().trim().length() != 0)  {
-            View v = (View) view;
+        if (value != null && value.toString().trim().length() != 0)  {
             String s = value.toString().trim();
             try {
-                Double i = Double.parseDouble(s);
+                Double.parseDouble(s);
             } catch (Exception e) {
                 return false;
             }
@@ -43,7 +42,13 @@ public class StringIsNumericDouble implements Validator<String> {
     }
 
     public String[] viewToMessageParams(View v) {
-        return toArray(getString((TextView) v));
+        if (v != null) {
+            if (TextView.class.isAssignableFrom(v.getClass())) {
+                return toArray(getString((TextView) v));
+            } else {
+                throw new IllegalArgumentException("Not the correct type. This validator requires a Text View but got "+v.getClass().getName());
+            }
+        } else return null;
     }
 
 

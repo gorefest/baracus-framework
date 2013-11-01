@@ -26,7 +26,7 @@ public class NumberMustBeGreaterThanZero extends AbstractValidator<String>{
     @Override
     public boolean validate(ConstrainedView<String> view) {
         String value = view.getCurrentValue();
-        if (value != null || value.toString().trim().length() != 0)  {
+        if (value != null && value.toString().trim().length() != 0)  {
             try {
                 Integer i = Integer.valueOf(value);
                 return i > 0;
@@ -49,7 +49,14 @@ public class NumberMustBeGreaterThanZero extends AbstractValidator<String>{
     }
 
     public String[] viewToMessageParams(View v) {
-        return toArray(getString((TextView) v));
+        if (v != null) {
+            if (TextView.class.isAssignableFrom(v.getClass())) {
+                return toArray(getString((TextView) v));
+            } else {
+                throw new IllegalArgumentException("Not the correct type. This validator requires a Text View but got "+v.getClass().getName());
+            }
+        } else return null;
+
     }
 
 
