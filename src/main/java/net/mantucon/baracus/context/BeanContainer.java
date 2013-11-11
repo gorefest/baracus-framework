@@ -28,7 +28,7 @@ public class BeanContainer {
     // We are carrying a className to Object map and a Class to Object map
     // this is simply done to avoid too many type based questions
     protected final static Map<String, Object> beanMap = new HashMap<String, Object>();
-    protected final static Map<Class<?>, Object> clazzMap= new HashMap<Class<?>, Object>();
+    private final static Map<Class<?>, Object> clazzMap= new HashMap<Class<?>, Object>();
 
     // fragment holder. registering all fragments as bean will cause them
     // to be held here. Registering fragments as bean makes them become
@@ -383,6 +383,14 @@ public class BeanContainer {
                 knownFragments.remove(f);
             }
         }
+    }
+
+    public static Object getBean(Class<?> clazz) {
+        Object result = clazzMap.get(clazz);
+        if (result == null) {
+            result = activeActivitiesMap.get(clazz);
+        }
+        return result;
     }
 
 }

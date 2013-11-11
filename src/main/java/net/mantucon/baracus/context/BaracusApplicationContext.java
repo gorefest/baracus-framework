@@ -188,6 +188,7 @@ public abstract class BaracusApplicationContext extends Application {
                 public void onActivityResumed(Activity activity) {
                     logger.debug("onActivityResumed called for $1",activity.getClass().getName());
                     BeanContainer.removePausedActivity(activity);
+                    beanContainer.performInjection(activity);
                 }
 
                 @Override
@@ -673,7 +674,7 @@ public abstract class BaracusApplicationContext extends Application {
      * @return the instance of the bean or null
      */
     public static <T> T  getBean(Class<T> clazz) {
-        return (T) BeanContainer.clazzMap.get(clazz);
+        return (T) BeanContainer.getBean(clazz);
     }
 
     /**

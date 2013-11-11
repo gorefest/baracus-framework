@@ -3,6 +3,9 @@ VERSION 0.7
 
 - Bugfixes wrong logging (wrong logger level instead of output logging level)
 - Missing removal of data change listeners added
+- now also look in active activities when asking for a bean class
+- Bugfix : Resuming an activity requires dependency injection on the activity
+
 
 VERSION 0.6
 - IMPORTANT: made an APKLIB out of this project. Use type "apklib" now in Your maven dependency!
