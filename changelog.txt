@@ -4,6 +4,7 @@ VERSION 0.7
 - Bugfixes wrong logging (wrong logger level instead of output logging level)
 - Missing removal of data change listeners added
 - now also look in active activities when asking for a bean class
+- now also allow managed activities to validate themselves
 - Bugfix : Resuming an activity requires dependency injection on the activity
 
 
