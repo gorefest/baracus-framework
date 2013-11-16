@@ -563,6 +563,22 @@ public abstract class BaracusApplicationContext extends Application {
     }
 
     /**
+     * performs a validation on the passed activity by trying to obtain
+     * the underlying view and validating it
+     *
+     * @param activity
+     * @return true, if the validation succeeded
+     */
+    public static synchronized boolean validateActivity(Activity activity) {
+        View underlyingView  = activity.getWindow().getDecorView().findViewById(android.R.id.content);
+        resetErrors(underlyingView);
+        validationFactory.validateView(underlyingView);
+        applyErrorsOnView(underlyingView);
+        return !viewHasErrors(underlyingView);
+    }
+
+
+    /**
      * registers an onFocusChangeListener to all view elements implementing
      * the @see ConstrainedView interface to perform on-the-fly-validation.
      * If you want Your View to be able to receive a validation callback
