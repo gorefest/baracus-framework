@@ -61,4 +61,6 @@ public class ManagedActivity extends Activity{
         return !BaracusApplicationContext.viewHasErrors(underlyingView);
     }
 
+
+
 }
