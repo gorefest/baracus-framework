@@ -4,7 +4,7 @@
 
     <groupId>org.baracus</groupId>
     <artifactId>baracus-framework</artifactId>
-    <version>0.7-SNAPSHOT</version>
+    <version>0.7</version>
     <packaging>apklib</packaging>
 
     <name>baracus-framework</name>
@@ -154,7 +154,7 @@
         </profile>
 
         <profile>
-            <id>deployment-nexus</id>
+            <id>deployment-nexus-mantucon</id>
             <distributionManagement>
                 <!-- Publish versioned releases here -->
                 <repository>
@@ -202,6 +202,21 @@
         </developer>
     </developers>
 
+    <distributionManagement>
+        <!-- Publish versioned releases here -->
+        <repository>
+            <id>sonatype-staging</id>
+            <name>Sonatype Release Staging Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+
+        <!-- Publish snapshots here -->
+        <snapshotRepository>
+            <id>sonatype-snapshot</id>
+            <name>Sonatype Snapshot Repository</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
     <!--repositories>
         <repository>
             <id>mantucon-repo</id>

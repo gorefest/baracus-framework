@@ -8,7 +8,6 @@ import android.view.View;
  * User: marcus
  * Date: 24.09.13
  * Time: 10:21
- * To change this template use File | Settings | File Templates.
  */
 public abstract class AbstractValidator<T> implements Validator<T> {
 
