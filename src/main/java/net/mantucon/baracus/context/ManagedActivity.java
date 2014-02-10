@@ -5,11 +5,9 @@ import android.os.Bundle;
 import android.view.View;
 
 /**
- * Created with IntelliJ IDEA.
  * User: marcus
  * Date: 23.09.13
  * Time: 08:34
- * To change this template use File | Settings | File Templates.
  */
 public class ManagedActivity extends Activity{
 
@@ -18,7 +16,7 @@ public class ManagedActivity extends Activity{
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        this.underlyingView = getWindow().getDecorView().findViewById(android.R.id.content);
+        setUnderlyingView();
     }
 
     @Override
@@ -40,7 +38,14 @@ public class ManagedActivity extends Activity{
      *
      */
     public void enableFocusChangeBasedValidation() {
+        if (underlyingView == null) {
+            setUnderlyingView();
+        }
         BaracusApplicationContext.registerValidationListener(underlyingView);
+    }
+
+    private void setUnderlyingView() {
+        this.underlyingView = getWindow().getDecorView().findViewById(android.R.id.content);
     }
 
     @Override
@@ -50,9 +55,10 @@ public class ManagedActivity extends Activity{
 
 
     /**
-     * perform a validation on all validateable fields, map the errors the the view
+     * perform a validation on all validateable fields, map the errors the the view. This is a shortcut
+     * method instead of calling all the context functions manually.
      *
-     * @return a boolean indicating whether the view is valid
+     * @return a boolean indicating whether the view is valid (true = valid, false = invalid, has errors)
      */
     public boolean validate() {
         BaracusApplicationContext.resetErrors(underlyingView);
