@@ -128,7 +128,7 @@ public abstract class BaseDao<T extends AbstractModelBase>{
     public int delete(final AbstractModelBase model){
         int result=0;
         if (!model.isTransient()) {
-            result = db.delete(model.getTableName(), AbstractModelBase.idCol.fieldName + " = ?", new String[]{model.getId().toString()});
+            result = db.delete(model.getTableName(), getIdField() + " = ?", new String[]{model.getId().toString()});
             BaracusApplicationContext.emitDeleteEvent(managedClass);
             model.setTransient(true);
         } else {
@@ -149,7 +149,7 @@ public abstract class BaseDao<T extends AbstractModelBase>{
         Cursor c = null;
         T result = null;
         try {
-            c = db.query(true, rowMapper.getAffectedTable(), rowMapper.getFieldList().getFieldNames(), AbstractModelBase.idCol.fieldName + "= ?", new String[]{id.toString()}, null, null, null, null);
+            c = db.query(true, rowMapper.getAffectedTable(), rowMapper.getFieldList().getFieldNames(), getIdField() + "= ?", new String[]{id.toString()}, null, null, null, null);
             if (!c.isAfterLast() && c.moveToNext() ) {
                 result = rowMapper.from(c);
             } else {
@@ -201,11 +201,10 @@ public abstract class BaseDao<T extends AbstractModelBase>{
      * @return all entities of Your type in database.
      */
     public List<T> loadAll() {
-        RowMapper<T> rowMapper = getRowMapper();
         Cursor c = null;
         List<T> result = new LinkedList<T>();
         try {
-            c = db.query(true, rowMapper.getAffectedTable(), rowMapper.getFieldList().getFieldNames(), null, null, null, null, null, null);
+            c = getLoadAllCursor();
             result = iterateCursor(c);
 
         } catch (Exception e) {
@@ -216,6 +215,15 @@ public abstract class BaseDao<T extends AbstractModelBase>{
             }
         }
         return result;
+    }
+
+    /**
+     * @return a Cursor for the loadAll Query. Notice, You have to take care of this cursor by Yourself!!
+     * @since 0.8
+     */
+    public Cursor getLoadAllCursor() {
+        RowMapper<T> rowMapper  = getRowMapper();
+        return db.query(true, rowMapper.getAffectedTable(), rowMapper.getFieldList().getFieldNames(), null, null, null, null, null, null);
     }
 
     /**
@@ -255,7 +263,7 @@ public abstract class BaseDao<T extends AbstractModelBase>{
      * @param item - the model bean to save
      */
     public void save(T item) {
-        save(item,null);
+        save(item, null);
     }
 
     /**
@@ -266,7 +274,7 @@ public abstract class BaseDao<T extends AbstractModelBase>{
      * @param handle - the transaction handle
      */
     public void save(T item, TxHandle handle) {
-        logger.trace("save object $1",item);
+        logger.trace("save object $1", item);
 
         boolean requiresSetChange = false;
         boolean requiresInstanceChange = false;
@@ -296,7 +304,7 @@ public abstract class BaseDao<T extends AbstractModelBase>{
                     if (t.getCreationDate() == null) { t.setCreationDate(new Date()); }
                     t.setLastModificationDate(new Date());
                 }
-                db.update(rowMapper.getAffectedTable(), cv, AbstractModelBase.idCol.fieldName + "= ?", new String[]{item.getId().toString()});
+                db.update(rowMapper.getAffectedTable(), cv, getIdField() + "= ?", new String[]{item.getId().toString()});
                 requiresInstanceChange = true;
             }
             if (localTransaction) {
@@ -315,6 +323,18 @@ public abstract class BaseDao<T extends AbstractModelBase>{
         if (requiresInstanceChange) {
             BaracusApplicationContext.emitDataChangeEvent(item);
         }
+    }
+
+    /**
+     * @return the ID column. Override this, if You want to use another ID column
+     *         Notice: Your model must not include the AbstractModelBase-FieldList!
+     *                 You must define the entire entity by Yourself!
+      
+     *         The naming technique is subject for change towards the android
+     *         standard (_id)!
+     */
+    protected String getIdField() {
+        return AbstractModelBase.idCol.fieldName;
     }
 
     /**

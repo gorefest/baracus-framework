@@ -1,3 +1,8 @@
+VERSION 0.8
+
+- added the getIdField function in order to make overriding the id column naming possible
+- added the getLoadAllCursor in order to make linking to a data DataBoundAdapter possible
+
 
 VERSION 0.7
 
