@@ -3,9 +3,19 @@ VERSION 0.8
 - added the getIdField function in order to make overriding the id column naming possible
 - added the getLoadAllCursor in order to make linking to a data DataBoundAdapter possible
 
+--- DEPRECATION NOTICE ---
+- don't inherit AbstractModelBase any more! The "id" column clashes
+  with the android convention of carrying and "_id" column, so I added
+  a boolean parameter to force You making a review on Your model classes.
+  You can either inherit LegacyModelBase (same behaviour like before) or
+  - and this is recommended - alter Your tables by renaming the "id" column
+  to an "_id" column. This restrict impacts when You try to fill view withs
+  data using a cursor. So either You must consider using the LegacyBean
+  or You should modify Your code.
+
 
 VERSION 0.7
-
+                                                     p
 - Bugfixes wrong logging (wrong logger level instead of output logging level)
 - Missing removal of data change listeners added
 - now also look in active activities when asking for a bean class

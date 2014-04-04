@@ -4,12 +4,11 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import net.mantucon.baracus.annotations.Bean;
 import net.mantucon.baracus.model.ConfigurationParameter;
-import net.mantucon.baracus.orm.AbstractModelBase;
 import net.mantucon.baracus.orm.Field;
 import net.mantucon.baracus.orm.FieldList;
 
 import static net.mantucon.baracus.model.ConfigurationParameter.*;
-import static net.mantucon.baracus.orm.AbstractModelBase.idCol;
+import static net.mantucon.baracus.orm.LegacyModelBase.idCol;
 /**
  * <pre>
  * Configuration DAO component <br>

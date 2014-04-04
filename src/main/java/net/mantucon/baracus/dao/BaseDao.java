@@ -5,10 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import net.mantucon.baracus.annotations.Bean;
 import net.mantucon.baracus.context.BaracusApplicationContext;
-import net.mantucon.baracus.orm.AbstractModelBase;
-import net.mantucon.baracus.orm.Field;
-import net.mantucon.baracus.orm.FieldList;
-import net.mantucon.baracus.orm.Timestamped;
+import net.mantucon.baracus.orm.*;
 import net.mantucon.baracus.util.Logger;
 
 import java.util.Date;
@@ -334,7 +331,9 @@ public abstract class BaseDao<T extends AbstractModelBase>{
      *         standard (_id)!
      */
     protected String getIdField() {
-        return AbstractModelBase.idCol.fieldName;
+        return ModelBase.class.isAssignableFrom(managedClass)
+                ? ModelBase.idCol.fieldName :
+                LegacyModelBase.idCol.fieldName;
     }
 
     /**

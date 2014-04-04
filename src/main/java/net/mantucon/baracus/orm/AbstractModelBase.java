@@ -6,97 +6,26 @@ package net.mantucon.baracus.orm;
  * Date: 24.09.12
  * Time: 08:10
  *
- * Base class to all persistence objects. You want a table based persistence bean?
- * Simply inherit this class and add your fields to the field list.
+ * Base class to all internal persistence objects.
  *
- * this very static way of wiring the table is a very fast one.
+ * If You want to add a persistence bean, simply inherit ModelBase!
  *
- * After defining the model bean, be sure that you have a @see MigrationStep creating the table and
- * defining a DAO bean managing the persistence access.
- *
- * Example  :
-
- public class ConfigurationParameter extends AbstractModelBase {
-
-    public static final String TABLE_CONFIGURATION = "configuration";
-
-    private static int prefix=0;
-
-    private String configParameter;
-    private String configParameterValue;
-
-    public static final FieldList fieldList = new FieldList(ConfigurationParameter.class.getSimpleName());
-    public static final Field configParamCol = new Field("config_parameter",AbstractModelBase.fieldList.size() + prefix++);
-    public static final Field configParamValueCol = new Field("config_parameter_value",AbstractModelBase.fieldList.size() + prefix++);
-
-    static {
-        fieldList.add(AbstractModelBase.fieldList);
-        fieldList.add(configParamCol);
-        fieldList.add(configParamValueCol);
-    }
-
-    public ConfigurationParameter() {
-        super(TABLE_CONFIGURATION);
-    }
-
-     @Override
-     public boolean equals(Object o) {
-         if (this == o) return true;
-         if (!(o instanceof ConfigurationParameter)) {
-          return false;
-        }
-        if (!super.equals(o)) {
-          return false;
-        }
-
-        ConfigurationParameter that = (ConfigurationParameter) o;
-
-        if (!configParameter.equals(that.configParameter)) {
-            return false;
-        }
-
-        if (configParameterValue != null ? !
-            configParameterValue.equals(that.configParameterValue) : that.configParameterValue != null)
-             {   return false; }
-
-        return true;
-     }
-
-     @Override
-     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + configParameter.hashCode();
-        result = 31 * result + (configParameterValue != null ? configParameterValue.hashCode() : 0);
-        return result;
-     }
- }
-
-
- *
- *
+ * @see net.mantucon.baracus.orm.ModelBase
  *
  */
 public abstract class AbstractModelBase implements Identifiable {
 
-    /**
-     * the field list of the entity.
-     */
-
-    public static final Field idCol = new Field("id",0, true);
-
-    public static final FieldList fieldList = new FieldList(AbstractModelBase.class.getSimpleName(), idCol);
-
-/*    static {
-        fieldList.add(idCol);
-    }*/
+    public static final FieldList fieldList = new FieldList(AbstractModelBase.class.getSimpleName());
 
     protected Long id;
     private boolean isTransient = true;
     private final String tableName;
+    private final boolean isOldStyle;
 
 
-    protected AbstractModelBase(String tableName) {
+    AbstractModelBase(String tableName, boolean isOldStyle) {
         this.tableName = tableName;
+        this.isOldStyle = isOldStyle;
     }
 
     public boolean isTransient() {
@@ -156,5 +85,12 @@ public abstract class AbstractModelBase implements Identifiable {
                 ", isTransient=" + isTransient +
                 ", tableName='" + tableName + '\'' +
                 '}';
+    }
+
+    /**
+     * @return true, if You are using a legacy model bean
+     */
+    public boolean isOldStyle() {
+        return isOldStyle;
     }
 }

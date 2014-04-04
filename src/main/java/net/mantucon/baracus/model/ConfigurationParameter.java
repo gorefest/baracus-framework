@@ -3,6 +3,7 @@ package net.mantucon.baracus.model;
 import net.mantucon.baracus.orm.AbstractModelBase;
 import net.mantucon.baracus.orm.Field;
 import net.mantucon.baracus.orm.FieldList;
+import net.mantucon.baracus.orm.LegacyModelBase;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,7 +12,7 @@ import net.mantucon.baracus.orm.FieldList;
  * Time: 15:49
  * To change this template use File | Settings | File Templates.
  */
-public class ConfigurationParameter extends AbstractModelBase {
+public class ConfigurationParameter extends LegacyModelBase {
 
     public static final String TABLE_CONFIGURATION = "configuration";
 
