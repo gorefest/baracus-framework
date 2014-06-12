@@ -21,6 +21,12 @@ public class Exceptions {
         }
     }
 
+    final static class IncompatibleTypesException extends RuntimeException {
+        IncompatibleTypesException(String message) {
+            super(message);
+        }
+    }
+
     /**
      * Injection of a bean caused an error
      */

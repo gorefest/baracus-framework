@@ -2,6 +2,11 @@ VERSION 0.8
 
 - added the getIdField function in order to make overriding the id column naming possible
 - added the getLoadAllCursor in order to make linking to a data DataBoundAdapter possible
+- to be better able to work with persistence interfaces the LazyMorphicCollection has been
+  introduced in order to be able to return a List<Type> from a Dao<SpecialType>
+- interface registration now possible in order to extend code reuseability
+  additional to applicationContainer.registerBeanClass(aClass) you now can
+  call registerBeanClass(InterfaceType, BeanClass);
 
 --- DEPRECATION NOTICE ---
 - don't inherit AbstractModelBase any more! The "id" column clashes

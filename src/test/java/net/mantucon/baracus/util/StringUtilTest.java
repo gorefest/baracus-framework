@@ -2,7 +2,6 @@ package net.mantucon.baracus.util;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runners.JUnit4;
 
 /**
  * Created with IntelliJ IDEA.

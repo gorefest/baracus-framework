@@ -7,7 +7,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
 import net.mantucon.baracus.dao.BaracusOpenHelper;
 import net.mantucon.baracus.dao.ConfigurationDao;
 import net.mantucon.baracus.errorhandling.CustomErrorHandler;
@@ -19,13 +18,12 @@ import net.mantucon.baracus.signalling.*;
 import net.mantucon.baracus.util.Logger;
 import net.mantucon.baracus.validation.ValidationFactory;
 import net.mantucon.baracus.validation.Validator;
-import sun.misc.MessageUtils;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-
-import static net.mantucon.baracus.util.StringUtil.join;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.  <br>
@@ -33,50 +31,48 @@ import static net.mantucon.baracus.util.StringUtil.join;
  * Date: 10.07.12               <br>
  * Time: 06:05                  <br>
  * <hr>
- *
+ * <p/>
  * Base Application Context class. In order to use BARACUS you must inherit this class.
  * use the registerBeanClass() function to add all Your bean classes. Implement Initializable and
  * Destroyable interface in order to have creation / destruction lifecycle management support.
- *
+ * <p/>
  * <hr>
  * Example Context Implementation :
-<pre>
- {@code
-
- public class ApplicationContext extends BaracusApplicationContext{
-
- static {
-    registerBeanClass(BankDao.class);
-    ...
- }
-
-
- private static final Logger logger = new Logger(ApplicationContext.class);
-
- private ApplicationContext() {
- // protection constructor
- }
-
-
- }
-
- To make use of Your class as an app container, You must register it in the
- AndroidManifest.xml's application tag :
-
- {@code
-
- <application android:icon="@drawable/icon"
- android:label="@string/app_name"
- android:debuggable="true"
- android:theme="@android:style/Theme.DeviceDefault"
- android:name=".wonderapp.application.ApplicationContext">
-
-
- }
-
- </pre>
-
+ * <pre>
+ * {@code
  *
+ * public class ApplicationContext extends BaracusApplicationContext{
+ *
+ * static {
+ * registerBeanClass(BankDao.class);
+ * ...
+ * }
+ *
+ *
+ * private static final Logger logger = new Logger(ApplicationContext.class);
+ *
+ * private ApplicationContext() {
+ * // protection constructor
+ * }
+ *
+ *
+ * }
+ *
+ * To make use of Your class as an app container, You must register it in the
+ * AndroidManifest.xml's application tag :
+ *
+ * {@code
+ *
+ * <application android:icon="@drawable/icon"
+ * android:label="@string/app_name"
+ * android:debuggable="true"
+ * android:theme="@android:style/Theme.DeviceDefault"
+ * android:name=".wonderapp.application.ApplicationContext">
+ *
+ *
+ * }
+ *
+ * </pre>
  */
 public abstract class BaracusApplicationContext extends Application {
 
@@ -108,7 +104,7 @@ public abstract class BaracusApplicationContext extends Application {
     private static ErrorHandlingFactory errorHandlingFactory;
 
 
-    static{
+    static {
         registerBeanClass(ConfigurationDao.class);
         registerBeanClass(ValidationFactory.class);
         registerBeanClass(ErrorHandlingFactory.class);
@@ -128,7 +124,7 @@ public abstract class BaracusApplicationContext extends Application {
      * Context is not built up yet
      */
     public static class ContextNotYetCreatedException extends RuntimeException {
-        ContextNotYetCreatedException (String reason) {
+        ContextNotYetCreatedException(String reason) {
             super(reason);
         }
     }
@@ -145,7 +141,8 @@ public abstract class BaracusApplicationContext extends Application {
         }
     }
 
-    private static boolean init=false;
+    private static boolean init = false;
+
     public static synchronized void initApplicationContext() {
         if (!init) {
             beanContainer.createInstances();
@@ -167,7 +164,7 @@ public abstract class BaracusApplicationContext extends Application {
             callbacks = new ActivityLifecycleCallbacks() {
                 @Override
                 public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-                    logger.debug("onActivityCreated called for $1",activity.getClass().getName());
+                    logger.debug("onActivityCreated called for $1", activity.getClass().getName());
                     BeanContainer.addExistingActivity(activity);
 //                    beanContainer.holdBean(activity.getClass(), activity);
                     if (!init) {
@@ -180,47 +177,45 @@ public abstract class BaracusApplicationContext extends Application {
 
                 @Override
                 public void onActivityStarted(Activity activity) {
-                    logger.debug("onActivityStarted called for $1",activity.getClass().getName());
+                    logger.debug("onActivityStarted called for $1", activity.getClass().getName());
                     BeanContainer.addActiveActivity(activity);
                 }
 
                 @Override
                 public void onActivityResumed(Activity activity) {
-                    logger.debug("onActivityResumed called for $1",activity.getClass().getName());
+                    logger.debug("onActivityResumed called for $1", activity.getClass().getName());
                     BeanContainer.removePausedActivity(activity);
                     beanContainer.performInjection(activity);
                 }
 
                 @Override
                 public void onActivityPaused(Activity activity) {
-                    logger.debug("onActivityPaused called for $1",activity.getClass().getName());
+                    logger.debug("onActivityPaused called for $1", activity.getClass().getName());
                     BeanContainer.addPausedActivity(activity);
                 }
 
                 @Override
                 public void onActivityStopped(Activity activity) {
-                    logger.debug("onActivityStopped called for $1",activity.getClass().getName());
+                    logger.debug("onActivityStopped called for $1", activity.getClass().getName());
                     BeanContainer.removeActiveActivity(activity);
                     beanContainer.performOutjection(activity);
                 }
 
                 @Override
                 public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-                    logger.debug("onActivitySaveInstanceState called for $1",activity.getClass().getName());
+                    logger.debug("onActivitySaveInstanceState called for $1", activity.getClass().getName());
 
 //                    beanContainer.performOutjection(activity.getClass());
                 }
 
                 @Override
                 public void onActivityDestroyed(Activity activity) {
-                    logger.debug("onActivityDestroyed called for $1",activity.getClass().getName());
+                    logger.debug("onActivityDestroyed called for $1", activity.getClass().getName());
                     BeanContainer.removeExistingActivity(activity);
                 }
             };
 
             __instance.registerActivityLifecycleCallbacks(callbacks);
-
-
 
         }
 
@@ -241,10 +236,23 @@ public abstract class BaracusApplicationContext extends Application {
     }
 
     /**
+     * Register a bean class to be managed by the container, which is designated
+     * to be injected into an interface or a superclass. This methods throws an exception if
+     * theImplementation is not of type theInterface
+     *
+     * @param theSupertype      - the supertype to be used for injection
+     * @param theImplementation - the instance type to be used to be injected
+     */
+    public final static void registerBeanClass(Class<?> theSupertype, Class<?> theImplementation) {
+        beanContainer.registerBeanClass(theSupertype, theImplementation);
+    }
+
+    /**
      * resolve a string and replace parameters by passed strings
      * e.g. resolveString(R.string.foo,4711)
+     *
      * @param msgId - the android string resource id
-     * @param vars - the variables replacing $1,$2...$n in the string
+     * @param vars  - the variables replacing $1,$2...$n in the string
      * @return the substituted string
      */
     public static String resolveString(Integer msgId, String... vars) {
@@ -268,7 +276,7 @@ public abstract class BaracusApplicationContext extends Application {
      * single parameter function to avoid array wrapping in case of single parameters
      *
      * @param msgId - the android string resource id
-     * @param var - the variables replacing $1,$2...$n in the string
+     * @param var   - the variables replacing $1,$2...$n in the string
      * @return the substituted string
      */
     public static String resolveString(Integer msgId, String var) {
@@ -310,8 +318,9 @@ public abstract class BaracusApplicationContext extends Application {
      * register a deletion listener implementing the DeleteAwareComponent interface. This listener
      * is called automatically on the deletion of the associated class. notice, if a delete listener
      * causes in exception in the callback processing, it will be automatically removed from the listener table
+     *
      * @param clazz - the class
-     * @param dac - the delete listener
+     * @param dac   - the delete listener
      */
     public static synchronized void registerDeleteListener(Class<? extends AbstractModelBase> clazz, DeleteAwareComponent dac) {
         logger.debug("Registered DeleteListener $1 for class $2", clazz.getSimpleName(), dac.getClass().getSimpleName());
@@ -320,6 +329,7 @@ public abstract class BaracusApplicationContext extends Application {
 
     /**
      * emit a delete event on the passed model class
+     *
      * @param clazz - the class to raise the event for
      */
     public static synchronized void emitDeleteEvent(Class<? extends AbstractModelBase> clazz) {
@@ -337,6 +347,7 @@ public abstract class BaracusApplicationContext extends Application {
     /**
      * register a change listener on the entity. @see registerDeleteListener. same restrictions, same behaviour
      * but this time for change events
+     *
      * @param clazz
      * @param dac
      */
@@ -347,6 +358,7 @@ public abstract class BaracusApplicationContext extends Application {
 
     /**
      * emits a change event
+     *
      * @param clazz
      */
     public static synchronized void emitSetChangeEvent(Class<? extends AbstractModelBase> clazz) {
@@ -367,7 +379,7 @@ public abstract class BaracusApplicationContext extends Application {
      * but this time for change events
      *
      * @param clazz - the model class, for which we want to listen for changes
-     * @param dac - the change listener instance
+     * @param dac   - the change listener instance
      */
     public static synchronized void registerDataChangeListener(Class<? extends AbstractModelBase> clazz, DataChangeAwareComponent dac) {
         logger.debug("Registered SetChangeListener $1 for class $2", clazz.getSimpleName(), dac.getClass().getSimpleName());
@@ -384,8 +396,8 @@ public abstract class BaracusApplicationContext extends Application {
      *
      * @param dac - the change listener instance
      */
-    public static synchronized  void unregisterDataChangeListener(DataChangeAwareComponent<?> dac){
-        for ( Set<DataChangeAwareComponent> sets : dataListener.values()) {
+    public static synchronized void unregisterDataChangeListener(DataChangeAwareComponent<?> dac) {
+        for (Set<DataChangeAwareComponent> sets : dataListener.values()) {
             if (sets.remove(dac)) {
                 logger.debug("DAC was successfully removed $1", dac);
             }
@@ -420,7 +432,7 @@ public abstract class BaracusApplicationContext extends Application {
      * register a generic listener for a generic event.
      *
      * @param eventClass - the event class
-     * @param handler - the handler
+     * @param handler    - the handler
      */
     public static synchronized void registerGenericListener(Class<? extends GenericEvent> eventClass, GenericEventAwareComponent<?> handler) {
         logger.debug("Registered Generic Listener $1 for class $2", eventClass.getSimpleName(), handler.getClass().getSimpleName());
@@ -434,9 +446,10 @@ public abstract class BaracusApplicationContext extends Application {
 
     /**
      * Free all consumers of an generic event
+     *
      * @param eventClass
      */
-    public static synchronized void freeGenericListeners(Class<? extends GenericEvent> eventClass){
+    public static synchronized void freeGenericListeners(Class<? extends GenericEvent> eventClass) {
         Set<GenericEventAwareComponent<? extends GenericEvent>> set = eventConsumers.get(eventClass);
         if (set != null) {
             set.clear();
@@ -445,9 +458,10 @@ public abstract class BaracusApplicationContext extends Application {
 
     /**
      * Free all consumers of data change event
+     *
      * @param forClazz - the model class whose event listeners should be removed
      */
-    public static synchronized void freeDataChangeListeners(Class<? extends AbstractModelBase> forClazz){
+    public static synchronized void freeDataChangeListeners(Class<? extends AbstractModelBase> forClazz) {
         Set<DataChangeAwareComponent> set = dataListener.get(forClazz);
         if (set != null) {
             set.clear();
@@ -455,9 +469,9 @@ public abstract class BaracusApplicationContext extends Application {
     }
 
 
-
     /**
      * emit a generic event to all registered listeners
+     *
      * @param event
      */
     public static synchronized void emitGenericEvent(GenericEvent event) {
@@ -473,8 +487,6 @@ public abstract class BaracusApplicationContext extends Application {
             }
         }
     }
-
-
 
 
     /**
@@ -523,7 +535,7 @@ public abstract class BaracusApplicationContext extends Application {
     /**
      * register a named validator for performing field validation in forms.
      *
-     * @param name - the name of the validator
+     * @param name      - the name of the validator
      * @param validator - the validator instance
      */
     public static synchronized void registerValidator(String name, Validator<?> validator) {
@@ -532,6 +544,7 @@ public abstract class BaracusApplicationContext extends Application {
 
     /**
      * register a named validator using the simple class name (FooBarValidator -> fooBarValidator)
+     *
      * @param validator - the validator instance
      */
     public static void registerValidator(Validator<?> validator) {
@@ -570,7 +583,7 @@ public abstract class BaracusApplicationContext extends Application {
      * @return true, if the validation succeeded
      */
     public static synchronized boolean validateActivity(Activity activity) {
-        View underlyingView  = activity.getWindow().getDecorView().findViewById(android.R.id.content);
+        View underlyingView = activity.getWindow().getDecorView().findViewById(android.R.id.content);
         resetErrors(underlyingView);
         validationFactory.validateView(underlyingView);
         applyErrorsOnView(underlyingView);
@@ -585,7 +598,7 @@ public abstract class BaracusApplicationContext extends Application {
      * - e.g. in order to manage the visibility of an OK-Button or sth. -
      * Your View must implement the @see ValidatableView interface in
      * order to receive a validation notification callbacks.
-     *
+     * <p/>
      * If you implement a @see ManagedFragment, simply call
      * the enableFocusChangeBasedValidation() function in the onCreate-method
      *
@@ -599,6 +612,7 @@ public abstract class BaracusApplicationContext extends Application {
      * register a custom error handler. Use this stuff only, if You want to use specific view components
      * to handle Your errors, if you want to use standard android handling for any component,
      * use the registerStandardErrorHandler() function instead!
+     *
      * @param handler - the handler instance
      */
     public static synchronized void registerCustomErrorHandler(CustomErrorHandler handler) {
@@ -629,6 +643,7 @@ public abstract class BaracusApplicationContext extends Application {
 
     /**
      * map all bound errors to all findeable receivers on the container.
+     *
      * @param container - the container to map errors for
      */
     public static void applyErrorsOnView(View container) {
@@ -639,11 +654,11 @@ public abstract class BaracusApplicationContext extends Application {
      * adds an error to the passed view. use this function only, if want to perform manual form
      * validation! if you rely on automatic validation and error routing, simply call validateView
      *
-     * @param container - the container view
+     * @param container        - the container view
      * @param affectedResource - the resource id of the component, where the error occured
-     * @param messageId - the message id to display
-     * @param severity - the severity of the problem (currently unused)
-     * @param params - the parameters to be mapped to the resource resolution
+     * @param messageId        - the message id to display
+     * @param severity         - the severity of the problem (currently unused)
+     * @param params           - the parameters to be mapped to the resource resolution
      */
     public static void addErrorToView(View container, int affectedResource, int messageId, ErrorSeverity severity, String... params) {
         errorHandlingFactory.addErrorToView(container, affectedResource, messageId, severity, params);
@@ -660,15 +675,15 @@ public abstract class BaracusApplicationContext extends Application {
 
     /**
      * unregister all error handlers for a view. this should be called implicitly by the
-     * @see ManagedFragment and the
-     * @see ManagedActivity class
-     *
-     * If you are using own extension, make sure that you call this function before destroying
-     * the view in order to avoid memory leaks
      *
      * @param v
+     * @see ManagedFragment and the
+     * @see ManagedActivity class
+     * <p/>
+     * If you are using own extension, make sure that you call this function before destroying
+     * the view in order to avoid memory leaks
      */
-    public static void unregisterErrorhandlersForView(View v)  {
+    public static void unregisterErrorhandlersForView(View v) {
         errorHandlingFactory.unregisterCustomErrorHandlersForView(v);
     }
 
@@ -686,18 +701,19 @@ public abstract class BaracusApplicationContext extends Application {
 
     /**
      * @param clazz - the class of the bean to be returned
-     * @param <T> - class parametrizer
+     * @param <T>   - class parametrizer
      * @return the instance of the bean or null
      */
-    public static <T> T  getBean(Class<T> clazz) {
+    public static <T> T getBean(Class<T> clazz) {
         return (T) BeanContainer.getBean(clazz);
     }
 
     /**
      * run a type based dependency injection on the passed object
+     *
      * @param o - the object where injection shall be performed on
      */
-    public synchronized  static void performInjectionsOn(Object o) {
+    public synchronized static void performInjectionsOn(Object o) {
         if (!semaphore) {
             beanContainer.performInjection(o);
         }
@@ -706,8 +722,9 @@ public abstract class BaracusApplicationContext extends Application {
     /**
      * creates a bean instance not cached by the container - no singleton! -
      * for your personal transient use. does not support custom constructors!
+     *
      * @param clazz - the class to be instantiaten
-     * @param <T> the type
+     * @param <T>   the type
      * @return an instance of T with all refs to components injected
      */
     public static <T> T createPrototypeBean(Class<T> clazz) {

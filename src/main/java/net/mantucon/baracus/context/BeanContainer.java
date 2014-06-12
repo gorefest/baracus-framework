@@ -4,22 +4,22 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import net.mantucon.baracus.context.Exceptions.IncompatibleTypesException;
+import net.mantucon.baracus.context.Exceptions.InjectionException;
+import net.mantucon.baracus.context.Exceptions.RegistrationException;
 import net.mantucon.baracus.dao.BaracusOpenHelper;
 import net.mantucon.baracus.lifecycle.Destroyable;
 import net.mantucon.baracus.lifecycle.Initializeable;
 import net.mantucon.baracus.util.Logger;
 
-import net.mantucon.baracus.context.Exceptions.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
- *
  * Bean container carrying all bean instances order to keep the
  * Application somewhat tight.
- *
  */
 public class BeanContainer {
 
@@ -28,7 +28,8 @@ public class BeanContainer {
     // We are carrying a className to Object map and a Class to Object map
     // this is simply done to avoid too many type based questions
     protected final static Map<String, Object> beanMap = new HashMap<String, Object>();
-    private final static Map<Class<?>, Object> clazzMap= new HashMap<Class<?>, Object>();
+    private final static Map<Class<?>, Object> clazzMap = new HashMap<Class<?>, Object>();
+    private final static Map<Class<?>, Class<?>> interfaceMap = new HashMap<Class<?>, Class<?>>();
 
     // fragment holder. registering all fragments as bean will cause them
     // to be held here. Registering fragments as bean makes them become
@@ -36,9 +37,9 @@ public class BeanContainer {
     protected final static Set<Fragment> knownFragments = new HashSet<Fragment>();
 
     // stats maps for handling context events
-    protected final static Map<Class<?>, Object> activeActivitiesMap= new HashMap<Class<?>, Object>();
-    protected final static Map<Class<?>, Object> pausedActivitiesMap= new HashMap<Class<?>, Object>();
-    protected final static Map<Class<?>, Object> existingActivitiesMap= new HashMap<Class<?>, Object>();
+    protected final static Map<Class<?>, Object> activeActivitiesMap = new HashMap<Class<?>, Object>();
+    protected final static Map<Class<?>, Object> pausedActivitiesMap = new HashMap<Class<?>, Object>();
+    protected final static Map<Class<?>, Object> existingActivitiesMap = new HashMap<Class<?>, Object>();
 
 
     /**
@@ -75,7 +76,7 @@ public class BeanContainer {
     void performPostConstuct() {
         for (Object o : beanMap.values()) {
             if (o instanceof Initializeable) {
-                logger.debug("Running Post Construction method on $1",o.getClass().getName());
+                logger.debug("Running Post Construction method on $1", o.getClass().getName());
                 ((Initializeable) o).postConstruct();
             }
         }
@@ -94,6 +95,7 @@ public class BeanContainer {
 
     /**
      * locate the passed class instance and call injection
+     *
      * @param clazz - the class whose cached singleton instance shall be injected with components
      */
     void performInjection(Class<?> clazz) {
@@ -103,6 +105,7 @@ public class BeanContainer {
 
     /**
      * perform injection on the passed object instance
+     *
      * @param o
      */
     void performInjection(Object o) {
@@ -112,35 +115,35 @@ public class BeanContainer {
             for (Class<?> clazz2 : clazzMap.keySet()) {
                 if (type.equals(clazz2.getName())) {
                     field.setAccessible(true);
-                    logger.debug("$1.$2 candidate is $3",clazz.getName(),field.getName(),clazz2.getName());
+                    logger.debug("$1.$2 candidate is $3", clazz.getName(), field.getName(), clazz2.getName());
                     try {
                         field.set(o, clazzMap.get(clazz2));
                     } catch (IllegalAccessException e) {
-                        throw new InjectionException("Failed to set "+clazz.getName()+"."+field.getName()+" with bean "+clazz2.getName(),e);
+                        throw new InjectionException("Failed to set " + clazz.getName() + "." + field.getName() + " with bean " + clazz2.getName(), e);
                     }
                 } else if (type.equals(SQLiteDatabase.class.getName())) {
                     field.setAccessible(true);
-                    logger.debug("$1.$2 candidate is $3",clazz.getName(),field.getName(),clazz2.getName());
+                    logger.debug("$1.$2 candidate is $3", clazz.getName(), field.getName(), clazz2.getName());
                     try {
                         field.set(o, BaracusApplicationContext.getInstance().connectDbHandle());
                     } catch (IllegalAccessException e) {
-                        throw new InjectionException("OMG SQLite injection issued a major clusterfuck",e);
+                        throw new InjectionException("OMG SQLite injection issued a major clusterfuck", e);
                     }
                 } else if (type.equals(BaracusOpenHelper.class.getName())) {
                     field.setAccessible(true);
-                    logger.debug("$1.$2 candidate is $3",clazz.getName(),field.getName(),clazz2.getName());
+                    logger.debug("$1.$2 candidate is $3", clazz.getName(), field.getName(), clazz2.getName());
                     try {
                         field.set(o, BaracusApplicationContext.getInstance().connectOpenHelper());
                     } catch (IllegalAccessException e) {
-                        throw new InjectionException("OMG OpenHelper injection issued a major clusterfuck",e);
+                        throw new InjectionException("OMG OpenHelper injection issued a major clusterfuck", e);
                     }
                 } else if (type.equals(Context.class.getName())) {
                     field.setAccessible(true);
-                    logger.debug("$1.$2 candidate is $3",clazz.getName(),field.getName(),clazz2.getName());
+                    logger.debug("$1.$2 candidate is $3", clazz.getName(), field.getName(), clazz2.getName());
                     try {
                         field.set(o, BaracusApplicationContext.getInstance());
                     } catch (IllegalAccessException e) {
-                        throw new InjectionException("OMG Context injection issued a major clusterfuck",e);
+                        throw new InjectionException("OMG Context injection issued a major clusterfuck", e);
                     }
                 }
             }
@@ -180,12 +183,13 @@ public class BeanContainer {
 
     /**
      * tidy upp all managed references of clazz in order to avoid loitering objects
+     *
      * @param clazz
      */
     void performOutjection(Class<?> clazz) {
         Object o = clazzMap.get(clazz);
         if (o == null) {
-            logger.warn("Warning! Object of type $1 was already nulled!",clazz.getName());
+            logger.warn("Warning! Object of type $1 was already nulled!", clazz.getName());
         } else {
             performOutjection(o);
         }
@@ -198,7 +202,7 @@ public class BeanContainer {
             for (Class<?> clazz2 : clazzMap.keySet()) {
                 if (type.equals(clazz2.getName())) {
                     field.setAccessible(true);
-                    logger.debug("$1.$2 nullified",clazz.getName(),field.getName(),clazz2.getName());
+                    logger.debug("$1.$2 nullified", clazz.getName(), field.getName(), clazz2.getName());
                     try {
                         field.set(o, null);
                     } catch (IllegalAccessException e) {
@@ -215,13 +219,20 @@ public class BeanContainer {
      * this constructor is used to pass the context. Otherwise, your bean has to implement a default
      * constructor!
      *
-     * @param theClazz     - the clazz to instanciate
+     * @param theClazz - the clazz to instanciate
      * @throws InstantiationException
      * @throws IllegalAccessException
      * @throws java.lang.reflect.InvocationTargetException
      */
     void instantiateSingletonBean(Class<?> theClazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        Object result = instantiatePojo(theClazz);
+        Object result;
+
+        if (interfaceMap.containsKey(theClazz)) {
+            result = instantiatePojo(interfaceMap.get(theClazz));
+        } else {
+            result = instantiatePojo(theClazz);
+        }
+
         holdBean(theClazz, result);
     }
 
@@ -243,32 +254,34 @@ public class BeanContainer {
                 result = theClazz.newInstance();
                 break;
             } else if (parameterTypes.length == 1 && parameterTypes[0].equals(Context.class)) {
-                result = (T)  c.newInstance(BaracusApplicationContext.getContext());
+                result = (T) c.newInstance(BaracusApplicationContext.getContext());
                 break;
             }
         }
 
         if (result == null) {
-            throw new InstantiationException(theClazz.getName()+" could not be instantiated. Please provide a) a public default constructor or b) a public constructor takinng the Android Context as it's only parameter!");
+            throw new InstantiationException(theClazz.getName() + " could not be instantiated. Please provide a) a public default constructor or b) a public constructor takinng the Android Context as it's only parameter!");
         }
         return result;
     }
 
     /**
      * put the bean into the holders
+     *
      * @param theClazz
      * @param o
      */
     void holdBean(Class<?> theClazz, Object o) {
         beanMap.put(theClazz.getName(), o);
-        clazzMap.put(theClazz ,o);
-        if (o instanceof  Fragment) {
-            knownFragments.add((Fragment)o);
+        clazzMap.put(theClazz, o);
+        if (o instanceof Fragment) {
+            knownFragments.add((Fragment) o);
         }
     }
 
     /**
      * remove the bean class from the holders
+     *
      * @param theClazz
      */
     void removeBean(Class<?> theClazz) {
@@ -284,11 +297,10 @@ public class BeanContainer {
      * @param theClazz
      */
     final void registerBeanClass(Class<?> theClazz) {
-        final String clazzName =  theClazz.getName();
+        final String clazzName = theClazz.getName();
         if (!beanMap.containsKey(clazzName)) {
             try {
-                holdBean(theClazz,null);
-
+                holdBean(theClazz, null);
             } catch (Exception e) {
                 throw new RegistrationException(e);
             }
@@ -296,16 +308,43 @@ public class BeanContainer {
     }
 
     /**
+     * registers a bean class which shall be injected into a interface type or superclass
+     * this enables BARACUS users to code SPI-Style (Use interface instead of implementation class)
+     *
+     * @param interfaceType       - The interface type to which the managed instance of the implementation class
+     *                            shall be assigned
+     * @param implementationClass - The implementation class for the interface
+     */
+    final void registerBeanClass(Class<?> interfaceType, Class<?> implementationClass) {
+        if (interfaceType.isAssignableFrom(implementationClass)) {
+            try {
+                interfaceMap.put(interfaceType, implementationClass);
+                if (!clazzMap.containsKey(interfaceType)) {
+                    registerBeanClass(interfaceType);
+                }
+                if (!clazzMap.containsKey(implementationClass)) {
+                    registerBeanClass(implementationClass);
+                }
+            } catch (Exception e) {
+                throw new RegistrationException(e);
+            }
+            ;
+        } else {
+            throw new IncompatibleTypesException(implementationClass.getName() + " cannot be assigned to type " + interfaceType.getName() + " ");
+        }
+    }
+
+    /**
      * Shred the beans.
      */
     synchronized void shutdownContext() {
-            for (Object o : beanMap.values()) {
-                if (o instanceof Destroyable) {
-                    ((Destroyable) o).onDestroy();
-                }
+        for (Object o : beanMap.values()) {
+            if (o instanceof Destroyable) {
+                ((Destroyable) o).onDestroy();
             }
-            performDestruction();
-            System.gc();
+        }
+        performDestruction();
+        System.gc();
     }
 
     private void unregisterClasses() {
@@ -314,24 +353,28 @@ public class BeanContainer {
         }
     }
 
-    static void addActiveActivity(Activity activity){
-        addActivity(activity,activeActivitiesMap);
-    }
-    static void addExistingActivity(Activity activity){
-        addActivity(activity,existingActivitiesMap);
-    }
-    static void addPausedActivity(Activity activity){
-        addActivity(activity,pausedActivitiesMap);
+    static void addActiveActivity(Activity activity) {
+        addActivity(activity, activeActivitiesMap);
     }
 
-    static void removeActiveActivity(Activity activity){
-        removeActivity(activity,activeActivitiesMap);
+    static void addExistingActivity(Activity activity) {
+        addActivity(activity, existingActivitiesMap);
     }
-    static void removeExistingActivity(Activity activity){
-        removeActivity(activity,existingActivitiesMap);
+
+    static void addPausedActivity(Activity activity) {
+        addActivity(activity, pausedActivitiesMap);
     }
-    static void removePausedActivity(Activity activity){
-        removeActivity(activity,pausedActivitiesMap);
+
+    static void removeActiveActivity(Activity activity) {
+        removeActivity(activity, activeActivitiesMap);
+    }
+
+    static void removeExistingActivity(Activity activity) {
+        removeActivity(activity, existingActivitiesMap);
+    }
+
+    static void removePausedActivity(Activity activity) {
+        removeActivity(activity, pausedActivitiesMap);
     }
 
     static void printStats() {
@@ -341,28 +384,28 @@ public class BeanContainer {
     }
 
 
-    private static void addActivity(final Activity activity, final Map<Class<?>, Object> map ) {
+    private static void addActivity(final Activity activity, final Map<Class<?>, Object> map) {
 
         if (map.containsKey(activity.getClass())) {
             logger.debug("Activity class $1 already in keyset", activity.getClass().getName());
         }
 
-        if (map.containsValue(activity))  {
-            logger.debug("Activity $1 already in values",activity);
+        if (map.containsValue(activity)) {
+            logger.debug("Activity $1 already in values", activity);
         }
 
-        map.put(activity.getClass(),activity);
+        map.put(activity.getClass(), activity);
         printStats();
     }
 
-    private static void removeActivity(final Activity activity, final Map<Class<?>, Object> map ) {
+    private static void removeActivity(final Activity activity, final Map<Class<?>, Object> map) {
 
         if (!map.containsKey(activity.getClass())) {
             logger.debug("Activity class $1 not in keyset", activity.getClass().getName());
         }
 
-        if (!map.containsValue(activity))  {
-            logger.debug("Activity $1 not in values",activity);
+        if (!map.containsValue(activity)) {
+            logger.debug("Activity $1 not in values", activity);
         }
 
         map.remove(activity.getClass());
