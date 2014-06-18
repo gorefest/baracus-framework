@@ -9,7 +9,7 @@ import android.view.View;
  * Date: 23.09.13
  * Time: 08:34
  */
-public class ManagedActivity extends Activity{
+public class ManagedActivity extends Activity {
 
     protected View underlyingView;
 
@@ -33,9 +33,8 @@ public class ManagedActivity extends Activity{
      * visibility of an OK-Button or sth. - Your View must implement
      * the @see ValidatableView interface in order to receive a validation
      * notification.
-     *
+     * <p/>
      * Notice, You must set the underlying view instance to enable this feature!
-     *
      */
     public void enableFocusChangeBasedValidation() {
         if (underlyingView == null) {
@@ -66,7 +65,6 @@ public class ManagedActivity extends Activity{
         BaracusApplicationContext.applyErrorsOnView(underlyingView);
         return !BaracusApplicationContext.viewHasErrors(underlyingView);
     }
-
 
 
 }

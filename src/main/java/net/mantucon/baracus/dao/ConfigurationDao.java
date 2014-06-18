@@ -9,6 +9,7 @@ import net.mantucon.baracus.orm.FieldList;
 
 import static net.mantucon.baracus.model.ConfigurationParameter.*;
 import static net.mantucon.baracus.orm.LegacyModelBase.idCol;
+
 /**
  * <pre>
  * Configuration DAO component <br>
@@ -46,10 +47,14 @@ public class ConfigurationDao extends BaseDao<ConfigurationParameter> {
         }
 
         @Override
-        public String getAffectedTable() { return TABLE_CONFIGURATION;  }
+        public String getAffectedTable() {
+            return TABLE_CONFIGURATION;
+        }
 
         @Override
-        public FieldList getFieldList() { return ConfigurationParameter.fieldList; }
+        public FieldList getFieldList() {
+            return ConfigurationParameter.fieldList;
+        }
 
         @Override
         public Field getNameField() {
@@ -58,9 +63,15 @@ public class ConfigurationDao extends BaseDao<ConfigurationParameter> {
 
         public ContentValues getContentValues(ConfigurationParameter parm) {
             ContentValues result = new ContentValues();
-            if (parm.getId() != null) { result.put(idCol.fieldName, parm.getId()); }
-            if (parm.getConfigParameter() != null) { result.put(configParamCol.fieldName, parm.getConfigParameter()); }
-            if (parm.getConfigParameterValue()!= null) { result.put(configParamValueCol.fieldName, parm.getConfigParameterValue()); }
+            if (parm.getId() != null) {
+                result.put(idCol.fieldName, parm.getId());
+            }
+            if (parm.getConfigParameter() != null) {
+                result.put(configParamCol.fieldName, parm.getConfigParameter());
+            }
+            if (parm.getConfigParameterValue() != null) {
+                result.put(configParamValueCol.fieldName, parm.getConfigParameterValue());
+            }
             return result;
         }
     };

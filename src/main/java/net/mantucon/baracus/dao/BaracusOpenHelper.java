@@ -22,51 +22,49 @@ import java.util.Map;
  *
  * </blockquote>
  * </pre>
- *
+ * <p/>
  * <hr>
  * Example:
+ * <p/>
+ * <pre>
+ * {@code
+ * public class OpenHelper extends BaracusOpenHelper {
  *
- <pre>
- {@code
- public class OpenHelper extends BaracusOpenHelper {
-
- public static final String DATABASE_NAME = "my_application.db";      // database name
- public static final int TARGET_DATABASE_VERSION = 110;             // target versiion
-
- static  {
-    upgradeSteps.put(100, new ModelVersion100()); // one upgrade since initial version
-    // here you can add all migration steps. please
-    // be sure to apply increasing numbers.
- }
-
-
- public OpenHelper(Context mContext) {
-    super(mContext, DATABASE_NAME, TARGET_DATABASE_VERSION);
- }
-
- public MigrationStep getInitialModel() {
-    return new ModelVersion100();
- }
-}
-</pre>
-
- Example Registration :
- <pre>
- {@code
-
- public class ApplicationContext extends BaracusApplicationContext{
-     ...
-     static {
-        ...
-        registerBeanClass(OpenHelper.class);
-        ...
-     }
-
-}
-}
-</pre>
+ * public static final String DATABASE_NAME = "my_application.db";      // database name
+ * public static final int TARGET_DATABASE_VERSION = 110;             // target versiion
+ *
+ * static  {
+ * upgradeSteps.put(100, new ModelVersion100()); // one upgrade since initial version
+ * // here you can add all migration steps. please
+ * // be sure to apply increasing numbers.
+ * }
  *
  *
+ * public OpenHelper(Context mContext) {
+ * super(mContext, DATABASE_NAME, TARGET_DATABASE_VERSION);
+ * }
+ *
+ * public MigrationStep getInitialModel() {
+ * return new ModelVersion100();
+ * }
+ * }
+ * </pre>
+ * <p/>
+ * Example Registration :
+ * <pre>
+ * {@code
+ *
+ * public class ApplicationContext extends BaracusApplicationContext{
+ * ...
+ * static {
+ * ...
+ * registerBeanClass(OpenHelper.class);
+ * ...
+ * }
+ *
+ * }
+ * }
+ * </pre>
  */
 public abstract class BaracusOpenHelper extends SQLiteOpenHelper implements Destroyable {
 
@@ -92,15 +90,15 @@ public abstract class BaracusOpenHelper extends SQLiteOpenHelper implements Dest
      */
     private final int targetDatabaseVersion;
 
-    static  {
+    static {
         upgradeSteps.put(110, new ModelVersion000());
     }
 
     /**
      * Open Helper for the android database
      *
-     * @param mContext - the android context
-     * @param databaseName  - the database name of your app
+     * @param mContext              - the android context
+     * @param databaseName          - the database name of your app
      * @param targetDatabaseVersion the target version. automatic migration will be done until this version
      */
     protected BaracusOpenHelper(Context mContext, String databaseName, int targetDatabaseVersion) {
@@ -126,14 +124,14 @@ public abstract class BaracusOpenHelper extends SQLiteOpenHelper implements Dest
     }
 
 
-    public MigrationStep getInitialModel(){
+    public MigrationStep getInitialModel() {
         return new ModelVersion000();
     }
 
     /**
      * use this method in order to add further migration steps to your db.
      * each release with database changes should bring a migration step
-     *
+     * <p/>
      * you should not change the prior defined steps any more. this will
      * make your database safe for creation and migration on
      * a brand new target system.
@@ -142,7 +140,7 @@ public abstract class BaracusOpenHelper extends SQLiteOpenHelper implements Dest
      */
     protected static final void addMigrationStep(MigrationStep step) {
         if (upgradeSteps.containsKey(step.getModelVersionNumber())) {
-            throw new VersionNumberAlreadyBoundException("The version number "+step.getModelVersionNumber()+" is already present in migration object list!");
+            throw new VersionNumberAlreadyBoundException("The version number " + step.getModelVersionNumber() + " is already present in migration object list!");
         }
         upgradeSteps.put(step.getModelVersionNumber(), step);
     }
@@ -151,19 +149,19 @@ public abstract class BaracusOpenHelper extends SQLiteOpenHelper implements Dest
      * Do not modify this function. Do not override. It takes care of your database
      * migration.
      *
-     * @param db - database ref
+     * @param db         - database ref
      * @param oldVersion - the current version
      * @param newVersion - the version to migrate to
      */
     @Override
     public final void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        for (int i = oldVersion+1 ; i <= newVersion; ++i) {
+        for (int i = oldVersion + 1; i <= newVersion; ++i) {
             MigrationStep step = upgradeSteps.get(i);
             if (step != null) {
-                logger.info("Applying Version $1",i);
+                logger.info("Applying Version $1", i);
                 step.applyVersion(db);
             } else {
-                logger.debug("No Version for $1",i);
+                logger.debug("No Version for $1", i);
             }
         }
     }

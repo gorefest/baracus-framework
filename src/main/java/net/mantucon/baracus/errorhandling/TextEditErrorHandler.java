@@ -4,26 +4,21 @@ import android.view.View;
 import android.widget.TextView;
 import net.mantucon.baracus.context.BaracusApplicationContext;
 
-import static net.mantucon.baracus.util.StringUtil.getString;
-import static net.mantucon.baracus.util.StringUtil.toArray;
-
 /**
  * Created with IntelliJ IDEA.
  * User: marcus
  * Date: 25.09.13
  * Time: 17:48
- *
+ * <p/>
  * Generic Error handling component to be applied on all TextViews passed for validation (if there
  * is any error to route to the view component)
- *
- *
  */
 public class TextEditErrorHandler implements StandardErrorHandler {
 
     @Override
     public boolean canHandleView(View v) {
         return (v != null && TextView.class.isAssignableFrom(v.getClass())); // Bind this handler to be applied to all
-                                                                             // Text views
+        // Text views
     }
 
     @Override
@@ -32,12 +27,13 @@ public class TextEditErrorHandler implements StandardErrorHandler {
         String message = BaracusApplicationContext.resolveString(errorMessageId, params);
         if (view != null) {
             if (TextView.class.isAssignableFrom(view.getClass())) {
-                TextView v  = (TextView) view;
+                TextView v = (TextView) view;
                 v.setError(message);
             } else {
-                throw new IllegalArgumentException("Not the correct type. This validator requires a Text View but got "+view.getClass().getName());
+                throw new IllegalArgumentException("Not the correct type. This validator requires a Text View but got " + view.getClass().getName());
             }
-        };
+        }
+        ;
 
     }
 
@@ -46,11 +42,12 @@ public class TextEditErrorHandler implements StandardErrorHandler {
         // This function removes the error message from the passed view
         if (view != null) {
             if (TextView.class.isAssignableFrom(view.getClass())) {
-                TextView v  = (TextView) view;
+                TextView v = (TextView) view;
                 v.setError(null);
             } else {
-                throw new IllegalArgumentException("Not the correct type. This validator requires a Text View but got "+view.getClass().getName());
+                throw new IllegalArgumentException("Not the correct type. This validator requires a Text View but got " + view.getClass().getName());
             }
-        };
+        }
+        ;
     }
 }

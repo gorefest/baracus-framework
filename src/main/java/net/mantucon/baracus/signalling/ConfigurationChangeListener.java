@@ -5,12 +5,11 @@ package net.mantucon.baracus.signalling;
  * User: marcus
  * Date: 27.03.13
  * Time: 11:22
- *
+ * <p/>
  * Use this class to
- *
  */
 @Deprecated
-public abstract class ConfigurationChangeListener{
+public abstract class ConfigurationChangeListener {
 
     private final String configurationElementName;
 

@@ -5,10 +5,9 @@ package net.mantucon.baracus.orm;
  * User: marcus
  * Date: 24.09.12
  * Time: 11:18
- *
+ * <p/>
  * indicate a field. notice, no type information is needed here, because of the
  * use of rowmappers in the dao layer.
- *
  */
 public class Field implements Comparable<Field> {
     /**
@@ -29,7 +28,7 @@ public class Field implements Comparable<Field> {
     /**
      * Constructor for regular fields. Assumes, that your field is not part of the key.
      *
-     * @param fieldName - db name of the field
+     * @param fieldName  - db name of the field
      * @param fieldIndex - the index of the field in the list
      */
     public Field(String fieldName, int fieldIndex) {
@@ -42,8 +41,8 @@ public class Field implements Comparable<Field> {
     /**
      * Constructor carrying a key information. normally the other constructor should fit your purpose.
      *
-     * @param fieldName - db name of the field
-     * @param fieldIndex - the index of the field in the list
+     * @param fieldName      - db name of the field
+     * @param fieldIndex     - the index of the field in the list
      * @param isKeyAttribute - key attribute indicator
      */
     public Field(String fieldName, int fieldIndex, boolean isKeyAttribute) {
@@ -59,13 +58,21 @@ public class Field implements Comparable<Field> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)  { return true; }
-        if (!(o instanceof Field)) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Field)) {
+            return false;
+        }
 
         Field field = (Field) o;
 
-        if (fieldIndex != field.fieldIndex) { return false; }
-        if (fieldName != null ? !fieldName.equals(field.fieldName) : field.fieldName != null) { return false; }
+        if (fieldIndex != field.fieldIndex) {
+            return false;
+        }
+        if (fieldName != null ? !fieldName.equals(field.fieldName) : field.fieldName != null) {
+            return false;
+        }
 
         return true;
     }

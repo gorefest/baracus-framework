@@ -13,6 +13,7 @@ import net.mantucon.baracus.errorhandling.CustomErrorHandler;
 import net.mantucon.baracus.errorhandling.ErrorHandlingFactory;
 import net.mantucon.baracus.errorhandling.ErrorSeverity;
 import net.mantucon.baracus.errorhandling.StandardErrorHandler;
+import net.mantucon.baracus.lifecycle.ApplicationContextInitializer;
 import net.mantucon.baracus.orm.AbstractModelBase;
 import net.mantucon.baracus.signalling.*;
 import net.mantucon.baracus.util.Logger;
@@ -103,6 +104,7 @@ public abstract class BaracusApplicationContext extends Application {
     private static ValidationFactory validationFactory;
     private static ErrorHandlingFactory errorHandlingFactory;
 
+    private static ApplicationContextInitializer applicationContextInitializer = null;
 
     static {
         registerBeanClass(ConfigurationDao.class);
@@ -153,6 +155,11 @@ public abstract class BaracusApplicationContext extends Application {
 
             validationFactory = getBean(ValidationFactory.class);
             errorHandlingFactory = getBean(ErrorHandlingFactory.class);
+
+            if (applicationContextInitializer != null) {
+                beanContainer.performInjection(applicationContextInitializer);
+                applicationContextInitializer.afterContextIsBuilt();
+            }
 
             init = true;
         }
@@ -558,7 +565,9 @@ public abstract class BaracusApplicationContext extends Application {
      * @param validatorList
      */
     public static synchronized void verifyValidators(String validatorList) {
-        validationFactory.verifyValidators(validatorList);
+        if (validationFactory != null) { // needed, otherwise preview in idea will throw NPE
+            validationFactory.verifyValidators(validatorList);
+        }
     }
 
     /**
@@ -752,5 +761,9 @@ public abstract class BaracusApplicationContext extends Application {
             logger.error("ERROR!", e);
             throw new BadResourceAccessException(e);
         }
+    }
+
+    public static void setApplicationContextInitializer(ApplicationContextInitializer applicationContextInitializer) {
+        BaracusApplicationContext.applicationContextInitializer = applicationContextInitializer;
     }
 }

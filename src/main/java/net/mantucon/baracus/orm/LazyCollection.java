@@ -7,10 +7,9 @@ import java.util.*;
  * User: marcus
  * Date: 24.09.12
  * Time: 15:18
- *
+ * <p/>
  * Lazy collection implementation. This collection is fitted with and LazyLoader implementation
  * taking care of the load of the data on the first access to this collection.
- *
  */
 public class LazyCollection<T> implements List<T> {
 
@@ -20,7 +19,7 @@ public class LazyCollection<T> implements List<T> {
      *
      * @param <T>
      */
-    public static interface LazyLoader<T>  {
+    public static interface LazyLoader<T> {
         public List<T> loadReference();
     }
 
@@ -48,14 +47,13 @@ public class LazyCollection<T> implements List<T> {
 
     /**
      * Helper function checking if a lazy load has to be performed.
-     *
+     * <p/>
      * If a lazy loader is armed, it will call the loadReference function on the
      * lazy loader on first access.
-     *
      */
     private void checkReferencedData() {
         synchronized (collectionState) {
-        if (collectionState == CollectionState.Armed) {
+            if (collectionState == CollectionState.Armed) {
                 collectionState = CollectionState.Loaded;
                 referencedData.addAll(lazyLoader.loadReference());
             }

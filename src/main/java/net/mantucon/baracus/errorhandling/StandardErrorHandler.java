@@ -7,12 +7,11 @@ import android.view.View;
  * User: marcus
  * Date: 25.09.13
  * Time: 17:47
- *
+ * <p/>
  * Interface for bridging baracus error handling onto normal android
  * error messaging. This technique mostly relies on the type (@see TextEditErrorHandler)
- *
  */
-public interface StandardErrorHandler extends ErrorHandler{
+public interface StandardErrorHandler extends ErrorHandler {
 
     /**
      * returns true, if the implementation class is able to make standard error

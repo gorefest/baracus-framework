@@ -14,9 +14,7 @@ import net.mantucon.baracus.validation.builtins.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import static net.mantucon.baracus.util.StringUtil.firstByteToLower;
-import static net.mantucon.baracus.util.StringUtil.join;
-import static net.mantucon.baracus.util.StringUtil.splitPurified;
+import static net.mantucon.baracus.util.StringUtil.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,7 +24,7 @@ import static net.mantucon.baracus.util.StringUtil.splitPurified;
  * To change this template use File | Settings | File Templates.
  */
 @Bean
-public class ValidationFactory implements Initializeable, Destroyable{
+public class ValidationFactory implements Initializeable, Destroyable {
 
     private static final Map<String, Validator<?>> namedValidators = new HashMap<String, Validator<?>>();
     private static final Logger logger = new Logger(ValidationFactory.class);
@@ -39,6 +37,7 @@ public class ValidationFactory implements Initializeable, Destroyable{
      */
     public static final class InvalidValidatorNameException extends RuntimeException {
         private final String validatorName;
+
         public InvalidValidatorNameException(String validatorName) {
             super();
             this.validatorName = validatorName;
@@ -46,14 +45,15 @@ public class ValidationFactory implements Initializeable, Destroyable{
 
         @Override
         public String getMessage() {
-            return "A VALIDATOR NAMED "+validatorName+" COULD NOT BE FOUND! AVAILABLE VALIDATORS :"+join(namedValidators.keySet());
+            return "A VALIDATOR NAMED " + validatorName + " COULD NOT BE FOUND! AVAILABLE VALIDATORS :" + join(namedValidators.keySet());
         }
     }
 
 
     /**
      * register a named validator
-     * @param name - name of the validator to be used in XML
+     *
+     * @param name      - name of the validator to be used in XML
      * @param validator - the validator instance
      */
     public synchronized void registerValidator(String name, Validator<?> validator) {
@@ -62,6 +62,7 @@ public class ValidationFactory implements Initializeable, Destroyable{
 
     /**
      * register a named validator, the name will be derived from the class name
+     *
      * @param validator - the validator instance
      */
     public synchronized void registerValidator(Validator<?> validator) {
@@ -77,8 +78,8 @@ public class ValidationFactory implements Initializeable, Destroyable{
     public void verifyValidators(String validatorList) {
         if (validatorList != null && validatorList.trim().length() > 0) {
             String[] validators = validatorList.split(",");
-            for (String v : validators){
-                if (!namedValidators.containsKey(v)){
+            for (String v : validators) {
+                if (!namedValidators.containsKey(v)) {
                     logger.error("A named validator $1 could not be found. Available validators : $2", v, join(namedValidators.keySet()));
                     throw new InvalidValidatorNameException(v);
                 }
@@ -89,7 +90,7 @@ public class ValidationFactory implements Initializeable, Destroyable{
     /**
      * Verify an entire View. This function will recurse all child views and look for
      * View Components implementing the ConstrainedView interface.
-     *
+     * <p/>
      * If a component is found, it will be validated by all validators denoted through the
      * validatedBy attribute. If a violation occurs, it is matter
      *
@@ -116,7 +117,7 @@ public class ValidationFactory implements Initializeable, Destroyable{
 
         if (ViewGroup.class.isAssignableFrom(v.getClass())) {
             ViewGroup viewGroup = (ViewGroup) v;
-            for (int i = 0; i < viewGroup.getChildCount(); i++ ) {
+            for (int i = 0; i < viewGroup.getChildCount(); i++) {
                 View nextChild = viewGroup.getChildAt(i);
                 if (nextChild != null) {
                     validateView(root, nextChild);
@@ -132,11 +133,12 @@ public class ValidationFactory implements Initializeable, Destroyable{
      * @param v
      */
     public void validateView(View v) {
-        validateView(v,v);
+        validateView(v, v);
     }
-        /**
-         * registers the built in validators
-         */
+
+    /**
+     * registers the built in validators
+     */
     @Override
     public void postConstruct() {
         registerValidator(new StringNotEmpty());
@@ -174,7 +176,7 @@ public class ValidationFactory implements Initializeable, Destroyable{
 
         if (ViewGroup.class.isAssignableFrom(v.getClass())) {
             ViewGroup viewGroup = (ViewGroup) v;
-            for (int i = 0; i < viewGroup.getChildCount(); i++ ) {
+            for (int i = 0; i < viewGroup.getChildCount(); i++) {
                 View nextChild = viewGroup.getChildAt(i);
                 if (nextChild != null) {
                     registerValidationListener(root, nextChild);
@@ -194,7 +196,7 @@ public class ValidationFactory implements Initializeable, Destroyable{
      * @param root - the view to perform validation on
      */
     public void registerValidationListener(final View root) {
-        registerValidationListener(root,root);
+        registerValidationListener(root, root);
     }
 
 }

@@ -31,6 +31,7 @@ public class DateUtil {
 
     /**
      * reverts a date string back into a date usign the system's date format
+     *
      * @param date - the date string
      * @return the parsed date
      */
@@ -74,7 +75,7 @@ public class DateUtil {
     }
 
     public static String toReverseDate(Date date) {
-        return date != null ?  new SimpleDateFormat("yyyyMMdd_hhmmss").format(date) : "";
+        return date != null ? new SimpleDateFormat("yyyyMMdd_hhmmss").format(date) : "";
     }
 
     public static Date addOneYear(Date in) {

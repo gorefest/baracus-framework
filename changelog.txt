@@ -7,6 +7,11 @@ VERSION 0.8
 - interface registration now possible in order to extend code reuseability
   additional to applicationContainer.registerBeanClass(aClass) you now can
   call registerBeanClass(InterfaceType, BeanClass);
+- bugfix for NullPointerException in Android preview in IntelliJ
+- added support for automatic selection of modified entities (BaseDao.getAllItemsModifiedAfter)
+  .. simply extend your rowmapper to implement TimestampSupportingRowmapper and return
+     the timestamp fields
+- added an after-context-init hook to enable application post-construct
 
 --- DEPRECATION NOTICE ---
 - don't inherit AbstractModelBase any more! The "id" column clashes
@@ -19,8 +24,9 @@ VERSION 0.8
   or You should modify Your code.
 
 
+
 VERSION 0.7
-                                                     p
+
 - Bugfixes wrong logging (wrong logger level instead of output logging level)
 - Missing removal of data change listeners added
 - now also look in active activities when asking for a bean class

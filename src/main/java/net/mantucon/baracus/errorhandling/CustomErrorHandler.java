@@ -5,14 +5,13 @@ package net.mantucon.baracus.errorhandling;
  * User: marcus
  * Date: 25.09.13
  * Time: 17:38
- *
+ * <p/>
  * Component interface for making a custom error handling.
- *
+ * <p/>
  * There is a vast difference to the StandardErrorHandlers : A custom error handler
  * always is bound to a view component instance and therefore it needs to be hashed
  * by its component id, whilst the StandardErrorHandlers simply rely on the type of
  * the passed component (So you only will find a set containing all StandardHandlers)
- *
  */
 public interface CustomErrorHandler extends ErrorHandler {
     /**

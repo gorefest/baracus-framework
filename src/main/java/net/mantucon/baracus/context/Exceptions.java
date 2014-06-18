@@ -34,6 +34,7 @@ public class Exceptions {
         InjectionException(Throwable reason) {
             super(reason);
         }
+
         InjectionException(String msg, Throwable reason) {
             super(msg, reason);
         }

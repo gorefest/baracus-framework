@@ -4,8 +4,6 @@ package net.mantucon.baracus.validation.builtins;
 import android.view.View;
 import android.widget.TextView;
 import net.mantucon.baracus.R;
-import net.mantucon.baracus.context.BaracusApplicationContext;
-import net.mantucon.baracus.errorhandling.ErrorSeverity;
 import net.mantucon.baracus.validation.ConstrainedView;
 import net.mantucon.baracus.validation.Validator;
 
@@ -25,7 +23,7 @@ public class StringIsNumericDouble implements Validator<String> {
     @Override
     public boolean validate(ConstrainedView<String> view) {
         String value = view.getCurrentValue();
-        if (value != null && value.toString().trim().length() != 0)  {
+        if (value != null && value.toString().trim().length() != 0) {
             String s = value.toString().trim();
             try {
                 Double.parseDouble(s);
@@ -46,11 +44,10 @@ public class StringIsNumericDouble implements Validator<String> {
             if (TextView.class.isAssignableFrom(v.getClass())) {
                 return toArray(getString((TextView) v));
             } else {
-                throw new IllegalArgumentException("Not the correct type. This validator requires a Text View but got "+v.getClass().getName());
+                throw new IllegalArgumentException("Not the correct type. This validator requires a Text View but got " + v.getClass().getName());
             }
         } else return null;
     }
-
 
 
 }

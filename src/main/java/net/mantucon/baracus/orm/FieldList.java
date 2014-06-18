@@ -11,9 +11,8 @@ import java.util.List;
  * User: marcus
  * Date: 24.09.12
  * Time: 11:20
- *
+ * <p/>
  * The field list of an entity.
- *
  */
 public class FieldList {
 
@@ -35,7 +34,7 @@ public class FieldList {
      * Locing constructor. Add all fields here. After that, this instance is locked
      * for modifications.
      *
-     * @param binder - the binding entity
+     * @param binder    - the binding entity
      * @param fieldList - the fields to add
      */
     public FieldList(String binder, Field... fieldList) {
@@ -53,12 +52,12 @@ public class FieldList {
 
     private static final Logger logger = new Logger(FieldList.class);
 
-    private boolean dirty=true;
+    private boolean dirty = true;
 
     public void add(Field field) {
         checkField(field);
         fields.add(field);
-        dirty=true;
+        dirty = true;
     }
 
     private void checkField(Field field) {
@@ -73,16 +72,16 @@ public class FieldList {
         }
 
         this.fields.addAll(fields);
-        dirty=true;
+        dirty = true;
     }
 
     public void add(FieldList fieldList) {
         add(fieldList.fields);
-        dirty=true;
+        dirty = true;
     }
 
     public String[] getFieldNames() {
-        String[] result =  new String[getFields().size()];
+        String[] result = new String[getFields().size()];
         int i = 0;
         for (Field f : getFields()) {
             result[i++] = f.fieldName;
@@ -96,7 +95,7 @@ public class FieldList {
             sb.append(f.fieldName).append(",");
         }
         String result = sb.toString();
-        return result.substring(0,result.length() -1);
+        return result.substring(0, result.length() - 1);
     }
 
     public String getFieldNamesAsStringWithoutKeyColumn() {
@@ -107,7 +106,7 @@ public class FieldList {
             }
         }
         String result = sb.toString();
-        return result.substring(0,result.length() -1);
+        return result.substring(0, result.length() - 1);
     }
 
     public int size() {
@@ -119,12 +118,12 @@ public class FieldList {
      */
     public String getParamsAsString() {
         StringBuilder sb = new StringBuilder();
-        for (int i =  0; i < fields.size(); i++) {
+        for (int i = 0; i < fields.size(); i++) {
             sb.append("?,");
         }
 
         String result = sb.toString();
-        return result.substring(0,result.length() -1);
+        return result.substring(0, result.length() - 1);
     }
 
     /**
@@ -138,7 +137,7 @@ public class FieldList {
             }
         }
         String result = sb.toString();
-        return result.substring(0,result.length() -1);
+        return result.substring(0, result.length() - 1);
     }
 
     public List<Field> getFields() {
@@ -154,7 +153,7 @@ public class FieldList {
         int i = 0;
         for (Field f : fields) {
             if (i != f.fieldIndex) {
-                logger.warn("WARNING! $1's field $2 is placed at $3, but should be on $4",binder , f.fieldName, f.fieldIndex, i);
+                logger.warn("WARNING! $1's field $2 is placed at $3, but should be on $4", binder, f.fieldName, f.fieldIndex, i);
 //                f.fieldIndex = i;
             }
             ++i;

@@ -33,14 +33,23 @@ public class Logger {
 
     public static interface LogTarget {
         public void debug(String tag, String msg, Throwable t);
+
         public void debug(String tag, String msg);
+
         public void info(String tag, String msg, Throwable t);
+
         public void info(String tag, String msg);
+
         public void warn(String tag, String msg, Throwable t);
+
         public void warn(String tag, String msg);
+
         public void error(String tag, String msg, Throwable t);
+
         public void error(String tag, String msg);
+
         public void trace(String tag, String msg, Throwable t);
+
         public void trace(String tag, String msg);
     }
 
@@ -73,7 +82,7 @@ public class Logger {
             Log.i(tag, msg);
         }
 
-        public void warn (String tag, String msg) {
+        public void warn(String tag, String msg) {
             Log.w(tag, msg);
         }
 
@@ -94,73 +103,75 @@ public class Logger {
 
         @SuppressWarnings("PMD")
         public void dump(String tag, String msg, Throwable t) {
-            System.out.println(tag+" "+msg);
-            if (t != null) { t.printStackTrace(); }
+            System.out.println(tag + " " + msg);
+            if (t != null) {
+                t.printStackTrace();
+            }
         }
+
         @Override
         public void debug(String tag, String msg, Throwable t) {
-            dump(tag,msg,t);
+            dump(tag, msg, t);
         }
 
         @Override
         public void debug(String tag, String msg) {
-            dump(tag,msg,null);
+            dump(tag, msg, null);
         }
 
         @Override
         public void info(String tag, String msg, Throwable t) {
-            dump(tag,msg,t);
+            dump(tag, msg, t);
         }
 
         @Override
         public void info(String tag, String msg) {
-            dump(tag,msg,null);
+            dump(tag, msg, null);
         }
 
         @Override
         public void warn(String tag, String msg, Throwable t) {
-            dump(tag,msg,t);
+            dump(tag, msg, t);
         }
 
         @Override
         public void warn(String tag, String msg) {
-            dump(tag,msg,null);
+            dump(tag, msg, null);
         }
 
         @Override
         public void error(String tag, String msg, Throwable t) {
-            dump(tag,msg,t);
+            dump(tag, msg, t);
         }
 
         @Override
         public void error(String tag, String msg) {
-            dump(tag,msg,null);
+            dump(tag, msg, null);
         }
 
         @Override
         public void trace(String tag, String msg, Throwable t) {
-            dump(tag,msg,t);
+            dump(tag, msg, t);
         }
 
         @Override
         public void trace(String tag, String msg) {
-            dump(tag,msg,null);
+            dump(tag, msg, null);
         }
     }
-
 
 
     private final String processMessageArgs(final String message, final Object... args) {
         String result = message;
-        for (int i = 0; i < args.length; ++i){
-            result= result.replace("$"+(i+1), String.valueOf(args[i]));
+        for (int i = 0; i < args.length; ++i) {
+            result = result.replace("$" + (i + 1), String.valueOf(args[i]));
         }
         return result;
     }
-    
+
     public Logger(String loggerId) {
         this.loggerId = loggerId;
-        log(Level.DEBUG, loggerId+" was registered");
+        log(Level.DEBUG, loggerId + " was registered");
     }
 
     public Logger(Class<?> classToLog) {
@@ -168,33 +179,45 @@ public class Logger {
     }
 
     public void debug(final String message, final Object... args) {
-        if (!isLoggable(Level.DEBUG)) { return; }
+        if (!isLoggable(Level.DEBUG)) {
+            return;
+        }
         log(Level.DEBUG, loggerId + " " + processMessageArgs(message, args));
     }
 
     public void error(final String message, final Object... args) {
-        if (!isLoggable(Level.ERROR)) { return; }
+        if (!isLoggable(Level.ERROR)) {
+            return;
+        }
         log(Level.ERROR, loggerId + " " + processMessageArgs(message, args));
     }
 
     public void fatal(final String message, final Object... args) {
-        if (!isLoggable(Level.ERROR)) { return; }
+        if (!isLoggable(Level.ERROR)) {
+            return;
+        }
         log(Level.ERROR, loggerId + " " + processMessageArgs(message, args));
     }
 
     public void info(final String message, final Object... args) {
-        if (!isLoggable(Level.INFO)) { return; }
-        log(Level.INFO, loggerId+" "+processMessageArgs(message,args));
+        if (!isLoggable(Level.INFO)) {
+            return;
+        }
+        log(Level.INFO, loggerId + " " + processMessageArgs(message, args));
     }
 
     public void trace(final String message, final Object... args) {
-        if (!isLoggable(Level.TRACE)) { return; }
-        log(Level.TRACE, loggerId+" "+processMessageArgs(message,args));
+        if (!isLoggable(Level.TRACE)) {
+            return;
+        }
+        log(Level.TRACE, loggerId + " " + processMessageArgs(message, args));
     }
 
     public void warn(final String message, final Object... args) {
-        if (!isLoggable(Level.WARN)) { return; }
-        log(Level.WARN, loggerId+" "+processMessageArgs(message,args));
+        if (!isLoggable(Level.WARN)) {
+            return;
+        }
+        log(Level.WARN, loggerId + " " + processMessageArgs(message, args));
     }
 
     public void debug(final String message) {
@@ -210,7 +233,7 @@ public class Logger {
     }
 
     public void info(final String message) {
-        log(Level.INFO, loggerId+" "+message);
+        log(Level.INFO, loggerId + " " + message);
     }
 
     public void trace(final String message) {
@@ -264,57 +287,58 @@ public class Logger {
     }
 
 
-    private void logMessage(String message, Level level2log,  Throwable t) {
+    private void logMessage(String message, Level level2log, Throwable t) {
         if (message == null) {
             message = "null";
         }
         switch (level2log) {
             case TRACE:
                 if (t != null) {
-                    logTarget.trace(TAG,message,t);
+                    logTarget.trace(TAG, message, t);
                 } else {
-                    logTarget.trace(TAG,message);
+                    logTarget.trace(TAG, message);
                 }
                 break;
             case DEBUG:
                 if (t != null) {
-                    logTarget.debug(TAG,message,t);
+                    logTarget.debug(TAG, message, t);
                 } else {
-                    logTarget.debug(TAG,message);
+                    logTarget.debug(TAG, message);
                 }
                 break;
             case INFO:
                 if (t != null) {
-                    logTarget.info(TAG,message,t);
+                    logTarget.info(TAG, message, t);
                 } else {
-                    logTarget.info(TAG,message);
+                    logTarget.info(TAG, message);
                 }
                 break;
             case WARN:
                 if (t != null) {
-                    logTarget.warn(TAG,message,t);
+                    logTarget.warn(TAG, message, t);
                 } else {
-                    logTarget.warn(TAG,message);
+                    logTarget.warn(TAG, message);
                 }
                 break;
             case ERROR:
                 if (t != null) {
-                    logTarget.error(TAG,message,t);
+                    logTarget.error(TAG, message, t);
                 } else {
-                    logTarget.error(TAG,message);
+                    logTarget.error(TAG, message);
                 }
                 break;
         }
     }
 
     private void log(Level level, String message, Throwable e) {
-         if (isLoggable(level)) {
-            logMessage(message,level, e);
-         }
+        if (isLoggable(level)) {
+            logMessage(message, level, e);
+        }
     }
+
     private void log(Level level, String message) {
         if (isLoggable(level)) {
-            logMessage(message, level,  null);
+            logMessage(message, level, null);
         }
     }
 

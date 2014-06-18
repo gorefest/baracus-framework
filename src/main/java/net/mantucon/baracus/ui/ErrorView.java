@@ -5,10 +5,8 @@ import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
-import net.mantucon.baracus.R;
 import net.mantucon.baracus.context.BaracusApplicationContext;
 import net.mantucon.baracus.errorhandling.CustomErrorHandler;
-import net.mantucon.baracus.errorhandling.ErrorHandler;
 import net.mantucon.baracus.errorhandling.ErrorSeverity;
 import net.mantucon.baracus.util.Logger;
 
@@ -49,7 +47,7 @@ public class ErrorView extends TextView implements CustomErrorHandler {
         for (int i = 0; i < attributeSet.getAttributeCount(); ++i) {
             log.info("$1 -> $2 -> $3", attributeSet.getAttributeName(i), attributeSet.getAttributeValue(i), attributeSet.getPositionDescription());
             if ("displayMessageFor".equals(attributeSet.getAttributeName(i))) {
-                this.displayMessageFor = attributeSet.getAttributeResourceValue(i,-1);
+                this.displayMessageFor = attributeSet.getAttributeResourceValue(i, -1);
                 log.info("DISPLAY MESSAGE HAS BEEN SET TO $1", displayMessageFor);
             }
 
@@ -79,7 +77,7 @@ public class ErrorView extends TextView implements CustomErrorHandler {
     @Override
     public void handleError(View view, int errorMessageId, ErrorSeverity severity, String... params) {
         String errorMessage = BaracusApplicationContext.resolveString(errorMessageId, params);
-        ErrorView visualRepresentation  = (ErrorView ) view.findViewById(this.getId());
+        ErrorView visualRepresentation = (ErrorView) view.findViewById(this.getId());
         visualRepresentation.setText(errorMessage);
 
         if (highlightTarget && displayMessageFor != -1) {

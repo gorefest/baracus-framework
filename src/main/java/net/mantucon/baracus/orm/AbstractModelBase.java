@@ -5,13 +5,12 @@ package net.mantucon.baracus.orm;
  * User: marcus
  * Date: 24.09.12
  * Time: 08:10
- *
+ * <p/>
  * Base class to all internal persistence objects.
- *
+ * <p/>
  * If You want to add a persistence bean, simply inherit ModelBase!
  *
  * @see net.mantucon.baracus.orm.ModelBase
- *
  */
 public abstract class AbstractModelBase implements Identifiable {
 

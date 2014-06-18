@@ -16,19 +16,19 @@ import java.util.List;
 
 /**
  * Annotation scanner
- *
+ * <p/>
  * Disfunctional on some android versions. do not use yet!
- *
  */
 
 @Deprecated
 public class AnnotationScanner {
 
-    private AnnotationScanner() { }
+    private AnnotationScanner() {
+    }
 
     private static final Logger logger = new Logger(AnnotationScanner.class);
 
-    public static <T extends Annotation> List<Class<?>> getClassesAnnotatedWith(Class<T> theAnnotation, Context context){
+    public static <T extends Annotation> List<Class<?>> getClassesAnnotatedWith(Class<T> theAnnotation, Context context) {
 
         // In theory, the class loader is not required to be a PathClassLoader
         Field field = null;
@@ -52,21 +52,21 @@ public class AnnotationScanner {
 
                         logger.debug("FOUND CLASS $1", entry);
                         if (entryClass == null) {
-                            logger.error("WARNING! Class of $1 is NULL!",entry);
+                            logger.error("WARNING! Class of $1 is NULL!", entry);
                         }
                         if (entryClass != null && entryClass.getAnnotation(theAnnotation) != null) {
                             logger.error("ADDED CLASS " + entryClass.getName());
                             candidates.add(entryClass);
                         }
-                    }catch (IllegalAccessError e) {
-                        logger.error("Exception during scan on $1",entry);
+                    } catch (IllegalAccessError e) {
+                        logger.error("Exception during scan on $1", entry);
                     }
                 }
             }
 
-        }catch (IOException e ) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
-        }catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
         return candidates;
@@ -74,7 +74,7 @@ public class AnnotationScanner {
 
     public static boolean carriesAnnotation(Class<?> clazz, Class<?> annotation) {
         for (Annotation a : clazz.getAnnotations()) {
-            logger.error("$1 carries $2",clazz.getSimpleName(),a.getClass().getName());
+            logger.error("$1 carries $2", clazz.getSimpleName(), a.getClass().getName());
             if (a.getClass().getName().equals(annotation.getName())) {
                 return true;
             }

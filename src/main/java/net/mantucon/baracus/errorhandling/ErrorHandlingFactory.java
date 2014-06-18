@@ -6,9 +6,10 @@ import net.mantucon.baracus.annotations.Bean;
 import net.mantucon.baracus.lifecycle.Destroyable;
 import net.mantucon.baracus.lifecycle.Initializeable;
 
-import java.util.*;
-
-import static net.mantucon.baracus.context.BaracusApplicationContext.resolveString;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,7 +19,7 @@ import static net.mantucon.baracus.context.BaracusApplicationContext.resolveStri
  * To change this template use File | Settings | File Templates.
  */
 @Bean
-public class ErrorHandlingFactory implements Initializeable, Destroyable{
+public class ErrorHandlingFactory implements Initializeable, Destroyable {
 
     // Error handlers
     private Map<View, Map<Integer, Object[]>> errorMap = new HashMap<View, Map<Integer, Object[]>>();
@@ -26,19 +27,18 @@ public class ErrorHandlingFactory implements Initializeable, Destroyable{
     private final Set<StandardErrorHandler> standardHandlers = new HashSet<StandardErrorHandler>();
 
 
-
     /**
      * adds an error with a specific error level to the passed view.
      * If an implementation of CustomErrorHandler is registered for the affectedResource, the error
      * will be automatically routed to that field
-     *
+     * <p/>
      * Notice : only to be used when you disregard automatic form validation
      *
-     * @param container - the containing view of the resource
+     * @param container        - the containing view of the resource
      * @param affectedResource - the resource
-     * @param messageId - a message ID
-     * @param severity - the severity. can be used by the CustomErrorHandler.
-     * @param params - the parameters varags used to replace $1..$n tags in the message text
+     * @param messageId        - a message ID
+     * @param severity         - the severity. can be used by the CustomErrorHandler.
+     * @param params           - the parameters varags used to replace $1..$n tags in the message text
      */
     public void addErrorToView(View container, int affectedResource, int messageId, ErrorSeverity severity, String... params) {
         if (!errorMap.containsKey(container)) {
@@ -82,16 +82,16 @@ public class ErrorHandlingFactory implements Initializeable, Destroyable{
 
         Map<Integer, Object[]> assignments = errorMap.get(container);
 
-        for (Map.Entry<Integer, Object[]> set: assignments.entrySet()) {
+        for (Map.Entry<Integer, Object[]> set : assignments.entrySet()) {
             View v = container.findViewById(set.getKey());
             // First, handle specific custom handler for using own error handling
             // technique
             if (v != null && CustomErrorHandler.class.isAssignableFrom(v.getClass())) {
-                ErrorHandler customErrorHandler= (ErrorHandler) v;
+                ErrorHandler customErrorHandler = (ErrorHandler) v;
                 Object[] params = set.getValue();
                 if (params.length > 2) {
-                    String[] strings =new String[params.length - 2];
-                    for (int i = 0; i < params.length-2; ++i){
+                    String[] strings = new String[params.length - 2];
+                    for (int i = 0; i < params.length - 2; ++i) {
                         strings[i] = (String) params[i];
                     }
                     Integer msgId = (Integer) params[0];
@@ -111,11 +111,11 @@ public class ErrorHandlingFactory implements Initializeable, Destroyable{
                         Integer msgId = (Integer) params[0];
                         ErrorSeverity severity = (ErrorSeverity) params[1];
                         if (params.length > 2) {
-                            String[] strings =new String[params.length - 2];
-                            for (int i = 0; i < params.length-2; ++i){
+                            String[] strings = new String[params.length - 2];
+                            for (int i = 0; i < params.length - 2; ++i) {
                                 strings[i] = String.valueOf(params[i]);
                             }
-                            handler.handleError(v,msgId, severity, strings);
+                            handler.handleError(v, msgId, severity, strings);
                         } else {
                             handler.handleError(v, msgId, severity);
                         }
@@ -127,11 +127,12 @@ public class ErrorHandlingFactory implements Initializeable, Destroyable{
 
     /**
      * Determines, whether a view is sticked with errors
+     *
      * @param v - the view to check
      * @return true, if any bound errors to the view are found in the errorMap
      */
-    public boolean viewHasErrors(View v){
-        if (errorMap.containsKey(v)){
+    public boolean viewHasErrors(View v) {
+        if (errorMap.containsKey(v)) {
             return errorMap.get(v).size() > 0;
         }
         return false;
@@ -139,17 +140,18 @@ public class ErrorHandlingFactory implements Initializeable, Destroyable{
 
     /**
      * remove all errors from the passed view
+     *
      * @param container - the view to clear
      */
     public void resetErrors(View container) {
         if (errorMap.containsKey(container)) {
             Map<Integer, Object[]> assignments = errorMap.get(container);
 
-            for (Integer key: assignments.keySet()) {
+            for (Integer key : assignments.keySet()) {
                 View v = container.findViewById(key);
 
                 if (CustomErrorHandler.class.isAssignableFrom(v.getClass())) {
-                    CustomErrorHandler customErrorHandler= (CustomErrorHandler) v;
+                    CustomErrorHandler customErrorHandler = (CustomErrorHandler) v;
                     // Object[] params =assignments.get(key);
                     customErrorHandler.reset(container);
                 }
@@ -168,6 +170,7 @@ public class ErrorHandlingFactory implements Initializeable, Destroyable{
      * register an error handler. an error handler normally is bound to another field in
      * the view. The error is raised by attaching an error to the field (view) component
      * bound to the CustomErrorHandler's idToDisplayFor-property
+     *
      * @param CustomErrorHandler
      */
     public void registerCustomErrorHandler(CustomErrorHandler CustomErrorHandler) {

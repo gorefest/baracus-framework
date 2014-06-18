@@ -9,7 +9,7 @@ package net.mantucon.baracus.orm;
  * to an object. Use this item esp. when setting a reference to another entity in order
  * to persist the reference.
  */
-public class ObjectReference<T extends AbstractModelBase> implements Reference<T>{
+public class ObjectReference<T extends AbstractModelBase> implements Reference<T> {
 
     private T object;
 

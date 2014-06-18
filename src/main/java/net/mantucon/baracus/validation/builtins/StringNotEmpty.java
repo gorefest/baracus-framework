@@ -1,13 +1,9 @@
 package net.mantucon.baracus.validation.builtins;
 
 
-import android.view.View;
 import net.mantucon.baracus.R;
-import net.mantucon.baracus.context.BaracusApplicationContext;
-import net.mantucon.baracus.errorhandling.ErrorSeverity;
 import net.mantucon.baracus.validation.AbstractValidator;
 import net.mantucon.baracus.validation.ConstrainedView;
-import net.mantucon.baracus.validation.Validator;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,7 +17,7 @@ public class StringNotEmpty extends AbstractValidator<String> {
     @Override
     public boolean validate(ConstrainedView<String> view) {
         String value = view.getCurrentValue();
-        if (value == null || value.toString().trim().length() == 0)  {
+        if (value == null || value.toString().trim().length() == 0) {
             return false;
         }
         return true;

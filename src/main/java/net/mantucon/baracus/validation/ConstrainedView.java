@@ -1,7 +1,5 @@
 package net.mantucon.baracus.validation;
 
-import android.view.View;
-
 /**
  * Created with IntelliJ IDEA.
  * User: marcus
@@ -11,5 +9,6 @@ import android.view.View;
  */
 public interface ConstrainedView<T> {
     T getCurrentValue();
+
     String getValidators();
 }

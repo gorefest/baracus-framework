@@ -21,16 +21,15 @@ import static net.mantucon.baracus.util.StringUtil.toArray;
  * User: marcus
  * Date: 24.09.13
  * Time: 08:47
- *
+ * <p/>
  * verifies that the passed String is a number greater than zero
- *
  */
-public class DateFromNow extends AbstractValidator<String>{
+public class DateFromNow extends AbstractValidator<String> {
 
     @Override
     public boolean validate(ConstrainedView<String> view) {
         String value = view.getCurrentValue();
-        if (value != null && value.toString().trim().length() != 0)  {
+        if (value != null && value.toString().trim().length() != 0) {
             java.text.DateFormat df = DateFormat.getDateFormat(BaracusApplicationContext.getContext());
             try {
                 Date d = df.parse(value);
@@ -56,11 +55,10 @@ public class DateFromNow extends AbstractValidator<String>{
             if (TextView.class.isAssignableFrom(v.getClass())) {
                 return toArray(getString((TextView) v));
             } else {
-                throw new IllegalArgumentException("Not the correct type. This validator requires a Text View but got "+v.getClass().getName());
+                throw new IllegalArgumentException("Not the correct type. This validator requires a Text View but got " + v.getClass().getName());
             }
         } else return null;
     }
-
 
 
 }

@@ -30,6 +30,7 @@ public class ReferenceLoader<T extends AbstractModelBase> {
     /**
      * load the referenced entity NOW and return it. This function will be triggered by
      * the lazy reference.
+     *
      * @return
      */
     public T loadObject() {

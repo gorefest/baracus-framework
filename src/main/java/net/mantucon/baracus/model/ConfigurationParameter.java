@@ -16,7 +16,7 @@ public class ConfigurationParameter extends LegacyModelBase {
 
     public static final String TABLE_CONFIGURATION = "configuration";
 
-    private static int prefix=0;
+    private static int prefix = 0;
 
     private String configParameter;
     private String configParameterValue;
@@ -56,7 +56,7 @@ public class ConfigurationParameter extends LegacyModelBase {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ConfigurationParameter))  {
+        if (!(o instanceof ConfigurationParameter)) {
             return false;
         }
         if (!super.equals(o)) {
