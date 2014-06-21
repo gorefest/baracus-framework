@@ -10,7 +10,10 @@ package net.mantucon.baracus.lifecycle;
  * make() method in the BaracusApplicationContext.
  * <p/>
  * You can register it using the BaracusApplicationContext.setApplicationContextInitializer
- * method
+ * method.
+ * <p/>
+ * Before the callback is fired, Baracus is going to run dependency injection over it, so
+ * You savely can use beans. Remember, the Initializer itself is not a bean!
  * <p/>
  * <p/>
  * Created by marcus on 18.06.14.

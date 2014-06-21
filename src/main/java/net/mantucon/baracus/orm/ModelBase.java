@@ -70,6 +70,9 @@ package net.mantucon.baracus.orm;
  */
 public abstract class ModelBase extends AbstractModelBase implements Identifiable {
 
+
+    public static final FieldList fieldList = new FieldList(AbstractModelBase.class.getSimpleName());
+
     /**
      * the field list of the entity.
      */
@@ -84,6 +87,14 @@ public abstract class ModelBase extends AbstractModelBase implements Identifiabl
 
     protected ModelBase(String tableName) {
         super(tableName, false);
+    }
+
+    protected ModelBase(String tableName, Long id) {
+        super(tableName, false);
+        this.id = id;
+        if (id != null) {
+            setTransient(false);
+        }
     }
 
     /**

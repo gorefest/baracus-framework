@@ -138,13 +138,20 @@ public abstract class BaseDao<T extends AbstractModelBase> {
     public int delete(final AbstractModelBase model) {
         int result = 0;
         if (!model.isTransient()) {
-            result = db.delete(model.getTableName(), getIdField() + " = ?", new String[]{model.getId().toString()});
+            Long id = model.getId();
+            result = deleteById(id);
             BaracusApplicationContext.emitDeleteEvent(managedClass);
             model.setTransient(true);
         } else {
             logger.warn("Warning. You tried to delete a transient entity of type $1. No operation performed!.", model.getClass().getName());
             result = -1;
         }
+        return result;
+    }
+
+    public int deleteById(Long id) {
+        int result;
+        result = db.delete(getRowMapper().getAffectedTable(), getIdField() + " = ?", new String[]{id.toString()});
         return result;
     }
 

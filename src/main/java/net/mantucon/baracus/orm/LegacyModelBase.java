@@ -12,6 +12,8 @@ package net.mantucon.baracus.orm;
 @Deprecated
 public abstract class LegacyModelBase extends AbstractModelBase implements Identifiable {
 
+    public static final FieldList fieldList = new FieldList(AbstractModelBase.class.getSimpleName());
+
     /**
      * the field list of the entity.
      */

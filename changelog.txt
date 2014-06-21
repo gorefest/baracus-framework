@@ -12,13 +12,15 @@ VERSION 0.8
   .. simply extend your rowmapper to implement TimestampSupportingRowmapper and return
      the timestamp fields
 - added an after-context-init hook to enable application post-construct
+- added a function deleteById carrying a Long parameter to the DAOs
+- added an constructor based "transient" determination to ModelBase
 
 --- DEPRECATION NOTICE ---
 - don't inherit AbstractModelBase any more! The "id" column clashes
   with the android convention of carrying and "_id" column, so I added
   a boolean parameter to force You making a review on Your model classes.
   You can either inherit LegacyModelBase (same behaviour like before) or
-  - and this is recommended - alter Your tables by renaming the "id" column
+  - and this is recommended - rebuild Your tables by renaming the "id" column
   to an "_id" column. This restrict impacts when You try to fill view withs
   data using a cursor. So either You must consider using the LegacyBean
   or You should modify Your code.

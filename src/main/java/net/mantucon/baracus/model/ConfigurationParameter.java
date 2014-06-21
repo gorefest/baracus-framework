@@ -1,6 +1,5 @@
 package net.mantucon.baracus.model;
 
-import net.mantucon.baracus.orm.AbstractModelBase;
 import net.mantucon.baracus.orm.Field;
 import net.mantucon.baracus.orm.FieldList;
 import net.mantucon.baracus.orm.LegacyModelBase;
@@ -22,11 +21,11 @@ public class ConfigurationParameter extends LegacyModelBase {
     private String configParameterValue;
 
     public static final FieldList fieldList = new FieldList(ConfigurationParameter.class.getSimpleName());
-    public static final Field configParamCol = new Field("config_parameter", AbstractModelBase.fieldList.size() + prefix++);
-    public static final Field configParamValueCol = new Field("config_parameter_value", AbstractModelBase.fieldList.size() + prefix++);
+    public static final Field configParamCol = new Field("config_parameter", LegacyModelBase.fieldList.size() + prefix++);
+    public static final Field configParamValueCol = new Field("config_parameter_value", LegacyModelBase.fieldList.size() + prefix++);
 
     static {
-        fieldList.add(AbstractModelBase.fieldList);
+        fieldList.add(LegacyModelBase.fieldList);
         fieldList.add(configParamCol);
         fieldList.add(configParamValueCol);
     }

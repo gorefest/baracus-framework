@@ -14,8 +14,6 @@ package net.mantucon.baracus.orm;
  */
 public abstract class AbstractModelBase implements Identifiable {
 
-    public static final FieldList fieldList = new FieldList(AbstractModelBase.class.getSimpleName());
-
     protected Long id;
     private boolean isTransient = true;
     private final String tableName;
