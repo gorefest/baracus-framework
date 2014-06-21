@@ -14,6 +14,7 @@ VERSION 0.8
 - added an after-context-init hook to enable application post-construct
 - added a function deleteById carrying a Long parameter to the DAOs
 - added an constructor based "transient" determination to ModelBase
+- added some utils for basic date calculation
 
 --- DEPRECATION NOTICE ---
 - don't inherit AbstractModelBase any more! The "id" column clashes

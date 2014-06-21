@@ -19,6 +19,8 @@ import java.util.GregorianCalendar;
  */
 public class DateUtil {
 
+    private static volatile GregorianCalendar gregorianCalendar = new GregorianCalendar();
+
     protected DateUtil() {
         // Protection Constructor
     }
@@ -78,19 +80,85 @@ public class DateUtil {
         return date != null ? new SimpleDateFormat("yyyyMMdd_hhmmss").format(date) : "";
     }
 
-    public static Date addOneYear(Date in) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(in);
-        cal.add(Calendar.YEAR, 1);
-        return cal.getTime();
-
-    }
 
     /**
      * @return today's date
      */
     public static Date today() {
         return fromEuropeanDate(toEuropeanDate(new Date()));
+    }
+
+    public static DayDate addDay(Date d) {
+        gregorianCalendar.setTime(d);
+        gregorianCalendar.add(Calendar.DAY_OF_MONTH, 1);
+        return new DayDate(gregorianCalendar.getTime());
+
+    }
+
+    public static DayDate subtractDay(Date d) {
+        gregorianCalendar.setTime(d);
+        gregorianCalendar.add(Calendar.DAY_OF_MONTH, -1);
+        return new DayDate(gregorianCalendar.getTime());
+
+    }
+
+    /*
+    public static DayDate subtractSecond(Date d) {
+        gregorianCalendar.setTime(d);
+        gregorianCalendar.add(Calendar.SECOND,-1);
+        return gregorianCalendar.getTime();
+
+    } */
+
+    public static DayDate addWeek(Date d) {
+        gregorianCalendar.setTime(d);
+        gregorianCalendar.add(Calendar.DAY_OF_MONTH, 7);
+        return new DayDate(gregorianCalendar.getTime());
+    }
+
+    public static DayDate addMonth(Date d) {
+        gregorianCalendar.setTime(d);
+        gregorianCalendar.add(Calendar.MONTH, 1);
+        return new DayDate(gregorianCalendar.getTime());
+    }
+
+    public static DayDate addMonths(Date d, int months) {
+        gregorianCalendar.setTime(d);
+        gregorianCalendar.add(Calendar.MONTH, months);
+        return new DayDate(gregorianCalendar.getTime());
+    }
+
+    public static DayDate addTwoMonths(Date d) {
+        gregorianCalendar.setTime(d);
+        gregorianCalendar.add(Calendar.MONTH, 2);
+        return new DayDate(gregorianCalendar.getTime());
+    }
+
+    public static DayDate addQuarter(Date d) {
+        gregorianCalendar.setTime(d);
+        gregorianCalendar.add(Calendar.MONTH, 3);
+        return new DayDate(gregorianCalendar.getTime());
+    }
+
+    public static DayDate addHalfYear(Date d) {
+        gregorianCalendar.setTime(d);
+        gregorianCalendar.add(Calendar.MONTH, 6);
+        return new DayDate(gregorianCalendar.getTime());
+    }
+
+    public static DayDate addYear(Date d) {
+        gregorianCalendar.setTime(d);
+        gregorianCalendar.add(Calendar.MONTH, 12);
+        return new DayDate(gregorianCalendar.getTime());
+    }
+
+    public static Date roundToDay(Date d) {
+        return fromEuropeanDate(toEuropeanDate(d));
+    }
+
+
+    public static DayDate addOneYear(Date today) {
+        return new DayDate(net.mantucon.baracus.util.DateUtil.addOneYear(today));
     }
 
 }
