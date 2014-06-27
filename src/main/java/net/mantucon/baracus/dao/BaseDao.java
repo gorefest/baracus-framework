@@ -8,9 +8,7 @@ import net.mantucon.baracus.context.BaracusApplicationContext;
 import net.mantucon.baracus.orm.*;
 import net.mantucon.baracus.util.Logger;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * DAO Base Class. If You want to make use of DAOs, You must derive this class to manage a
@@ -448,4 +446,44 @@ public abstract class BaseDao<T extends AbstractModelBase> {
     protected SQLiteDatabase getDb() {
         return db;
     }
+
+    /**
+     * return all data matching the example. only fields set with a value
+     * are regarded. If querying with wildcard, all Strings will be searched
+     * using LIKE. All criteria is connected using AND.
+     * <p/>
+     * Notice, if You want wildcard queries, You are responsible to place the
+     * joker symbols (%).
+     *
+     * @param example      - the example object
+     * @param withWildCard - if true, all strings will be search with LIKE
+     * @return a list matching all example data
+     */
+    public List<T> queryByExample(T example, boolean withWildCard) {
+        ContentValues cv = getRowMapper().getContentValues(example);
+        Set<Map.Entry<String, Object>> entries = cv.valueSet();
+        String[] args = new String[entries.size()];
+        StringBuilder clause = new StringBuilder();
+        int i = 0;
+        boolean withAnd = false;
+        for (Map.Entry<String, Object> entry : entries) {
+            if (withAnd) {
+                clause.append(" AND ");
+            } else {
+                withAnd = true;
+            }
+            if (entry.getValue() instanceof String) {
+                clause.append(entry.getKey()).append((withWildCard ? " LIKE ?" : " = ?"));
+            } else {
+                clause.append(entry.getKey()).append(" = ?");
+            }
+            args[i++] = entry.getValue().toString();
+        }
+
+        Cursor c = getDb().query(true, getRowMapper().getAffectedTable(), getRowMapper().getFieldList().getFieldNames(), clause.toString(), args, null, null, null, null);
+        List<T> result = iterateCursor(c);
+        c.close();
+        return result;
+    }
 }
+

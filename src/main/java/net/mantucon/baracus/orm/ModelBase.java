@@ -96,15 +96,4 @@ public abstract class ModelBase extends AbstractModelBase implements Identifiabl
             setTransient(false);
         }
     }
-
-    /**
-     * @return the string to be used in order to move Your old persistence bean
-     * to the new id column style. Simply create a new ModelVersion using
-     * Migr8 and fire this statement for each table You want to migrate
-     * from legacy id style to new _id style.
-     */
-    public String getMigrationStatement() {
-        return "UPDATE sqlite_master SET SQL=REPLACE(SQL,'id','_id') WHERE NAME = '" + this.getTableName() + "'";
-    }
-
 }
