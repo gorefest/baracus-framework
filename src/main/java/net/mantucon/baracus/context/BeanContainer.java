@@ -74,7 +74,10 @@ public class BeanContainer {
      * perform postconstruct method on all bean instances implementing Initializeable
      */
     void performPostConstuct() {
-        for (Object o : beanMap.values()) {
+
+        Set<Object> allBeans = new HashSet<Object>(beanMap.values()); // avoid multiple execution of postconstruct
+
+        for (Object o : allBeans) {
             if (o instanceof Initializeable) {
                 logger.debug("Running Post Construction method on $1", o.getClass().getName());
                 ((Initializeable) o).postConstruct();
@@ -228,18 +231,26 @@ public class BeanContainer {
         Object result;
 
         if (interfaceMap.containsKey(theClazz)) {
-            result = instantiatePojo(interfaceMap.get(theClazz));
+            Class<?> aClass = interfaceMap.get(theClazz);
+            result = beanMap.get(aClass.getName());
+            if (result == null) {
+                result = instantiatePojo(aClass);
+                holdBean(aClass, result);
+            }
         } else {
-            result = instantiatePojo(theClazz);
+            result = beanMap.get(theClazz.getName());
+            if (result == null) {
+                result = instantiatePojo(theClazz);
+            }
         }
 
         holdBean(theClazz, result);
     }
 
     /**
-     * create an instance of the passed class regarding the application context contructor
+     * reate an instance of the passed class regarding the application context contructor.
      *
-     * @param theClazz
+     * @param theClazz - the class to instantiate or look for
      * @return
      * @throws InstantiationException
      * @throws IllegalAccessException
@@ -247,6 +258,7 @@ public class BeanContainer {
      */
     <T> T instantiatePojo(Class<T> theClazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
         T result = null;
+
         for (Constructor c : theClazz.getConstructors()) {
             Class<?>[] parameterTypes = c.getParameterTypes();
             if (parameterTypes == null || parameterTypes.length == 0) {

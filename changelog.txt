@@ -7,6 +7,7 @@ VERSION 0.8
 - interface registration now possible in order to extend code reuseability
   additional to applicationContainer.registerBeanClass(aClass) you now can
   call registerBeanClass(InterfaceType, BeanClass);
+- also : replace bean implementations in the running application and context hot reinit
 - bugfix for NullPointerException in Android preview in IntelliJ
 - added support for automatic selection of modified entities (BaseDao.getAllItemsModifiedAfter)
   .. simply extend your rowmapper to implement TimestampSupportingRowmapper and return
