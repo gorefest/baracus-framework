@@ -13,5 +13,13 @@ import net.mantucon.baracus.orm.AbstractModelBase;
  * on the recordset you are listening to.
  */
 public interface DataSetChangeAwareComponent<T extends AbstractModelBase> {
-    public void onChange();
+    /**
+     * change notifier.
+     *
+     * @param clazz
+     * @since 0.8 : pass the class of the modified object in order to deal with
+     * inheritance hierarchies. If You don't need the param,
+     * simply ignore it.
+     */
+    void onChange(Class<? extends AbstractModelBase> clazz);
 }

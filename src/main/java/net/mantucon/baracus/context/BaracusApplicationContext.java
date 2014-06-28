@@ -372,7 +372,7 @@ public abstract class BaracusApplicationContext extends Application {
         if (changeListener.containsKey(clazz)) {
             DataSetChangeAwareComponent<?> dac = changeListener.get(clazz);
             try {
-                dac.onChange();
+                dac.onChange(clazz);
             } catch (Exception e) {
                 logger.error("Caught exception while emitting change set event", e);
                 changeListener.remove(clazz);
