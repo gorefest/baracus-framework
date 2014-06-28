@@ -165,6 +165,15 @@ public abstract class BaracusApplicationContext extends Application {
         }
     }
 
+    /**
+     * performs a reinitialization of the context. This function has to be called
+     * if bean implementations have been substituted by other candidates
+     */
+    public static void reinitializeContext() {
+        init = false;
+        initApplicationContext();
+    }
+
     public static synchronized void make() {
         if (!semaphore) {
             semaphore = true;
@@ -252,6 +261,22 @@ public abstract class BaracusApplicationContext extends Application {
      */
     public final static void registerBeanClass(Class<?> theSupertype, Class<?> theImplementation) {
         beanContainer.registerBeanClass(theSupertype, theImplementation);
+    }
+
+    /**
+     * replaces the implementation of the supertype by the passed implementation.
+     * when you make use of this feature, don't forget to call the reinitializeContext() function
+     * in order to get all instances created and DI performed with the new types after
+     * performing all replacements. This feature is especially useful when You make use
+     * of different implementations of an interface which shall be able to be hot-replaced
+     * in the application. However, the passed implementation MUST be assignable to theSupertype
+     * and it is essential to reinit the context after all replacements!
+     *
+     * @param theSupertype - the supertype to be used for injection
+     * @param theImplementation - - the instance type to be used to replace the existing instance
+     */
+    public final static void reRegisterBeanClass(Class<?> theSupertype, Class<?> theImplementation) {
+        beanContainer.replaceBeanClass(theSupertype, theImplementation);
     }
 
     /**

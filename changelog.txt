@@ -16,6 +16,8 @@ VERSION 0.8
 - added an constructor based "transient" determination to ModelBase
 - added some utils for basic date calculation
 - added queryByExample function in order to do QBE :)
+- modified DataSetChangeAware interface, now passes the emitted class in order to be able to
+  create aggregator-alike DataSetChangeAware components handling multiple entity types
 
 
 --- DEPRECATION NOTICE ---

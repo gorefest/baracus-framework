@@ -335,6 +335,20 @@ public class BeanContainer {
     }
 
     /**
+     * replace a bean implementation of an interface or of a superclass by another one
+     *
+     * @param interfaceType - The interface type to which the managed instance of the implementation class
+     *                        shall be replaced
+     * @param implementationClass - candidate used to replace the existing implementation
+     */
+    final void replaceBeanClass(Class<?> interfaceType, Class<?> implementationClass) {
+        interfaceMap.remove(interfaceType);
+        clazzMap.remove(interfaceType);
+        beanMap.remove(interfaceType);
+        registerBeanClass(interfaceType, implementationClass);
+    }
+
+    /**
      * Shred the beans.
      */
     synchronized void shutdownContext() {
