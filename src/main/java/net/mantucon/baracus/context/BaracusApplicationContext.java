@@ -788,7 +788,15 @@ public abstract class BaracusApplicationContext extends Application {
         }
     }
 
+    /**
+     * set the after-init application initializer. allows you to add a hook to the
+     * container lifecycle to be able to do something after the context is up
+     * (comparable to JEE Startup-Singleton)
+     *
+     * @param applicationContextInitializer
+     */
     public static void setApplicationContextInitializer(ApplicationContextInitializer applicationContextInitializer) {
         BaracusApplicationContext.applicationContextInitializer = applicationContextInitializer;
     }
+
 }

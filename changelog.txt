@@ -1,3 +1,10 @@
+VERSION 0.8.1
+
+- added function to create lazy object reference by dao and id to application context
+ (was useful to me for dto-to-model copy constructor)
+- added function to create lazy collection references by dao, id and remote field
+ (same like above)
+
 VERSION 0.8
 
 - added the getIdField function in order to make overriding the id column naming possible

@@ -4,7 +4,7 @@
 
     <groupId>org.baracus</groupId>
     <artifactId>baracus-framework</artifactId>
-    <version>0.8</version>
+    <version>0.8.1-SNAPSHOT</version>
     <packaging>apklib</packaging>
 
     <name>baracus-framework</name>

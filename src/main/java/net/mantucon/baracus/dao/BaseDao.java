@@ -214,6 +214,72 @@ public abstract class BaseDao<T extends AbstractModelBase> {
     }
 
     /**
+     * return a unique item identified by a generic field. This is especially useful
+     * when You want to query a single item specified by a field
+     *
+     * @param field - the name of the field used to query
+     * @param value - the String value to Query
+     * @return the object identified by this name
+     */
+    public T getUniqueByField(Field field, String value) {
+        logger.trace("get object by field  $1", field.fieldName);
+
+        RowMapper<T> rowMapper = getRowMapper();
+
+        Cursor c = null;
+        T result = null;
+        try {
+
+            c = db.query(true, rowMapper.getAffectedTable(), rowMapper.getFieldList().getFieldNames(), field.fieldName + "= ?", new String[]{value}, null, null, null, null);
+            if (!c.isAfterLast() && c.moveToNext()) {
+                result = rowMapper.from(c);
+                if (c.moveToNext()) {
+                    throw new IllegalArgumentException("Querying " + field.fieldName + " with value " + value + " does not return a single item!");
+                }
+            } else {
+                result = null;
+            }
+        } finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * return a unique item identified by a generic field. This is especially useful
+     * when You want to query a single item specified by a field
+     *
+     * @param field - the name of the field used to query
+     * @param value - the String value to Query
+     * @return the object identified by this name
+     */
+    public List<T> getByField(Field field, String value) {
+        logger.trace("get object collection by field  $1", field.fieldName);
+
+        RowMapper<T> rowMapper = getRowMapper();
+
+        Cursor c = null;
+        List<T> result = null;
+        try {
+
+            c = db.query(true, rowMapper.getAffectedTable(), rowMapper.getFieldList().getFieldNames(), field.fieldName + "= ?", new String[]{value}, null, null, null, null);
+            if (!c.isAfterLast() && c.moveToNext()) {
+                result = iterateCursor(c);
+            } else {
+                result = null;
+            }
+        } finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+        }
+        return result;
+    }
+
+
+    /**
      * @return all entities of Your type in database.
      */
     public List<T> loadAll() {
@@ -485,5 +551,65 @@ public abstract class BaseDao<T extends AbstractModelBase> {
         c.close();
         return result;
     }
+
+
+    /**
+     * Dirty Helper to create Reference Loader to another object. If You end up using this
+     * function to feed a LazyReference, You also can use createLazyReference()
+     *
+     * @param daoClass
+     * @param id
+     * @param <U>
+     * @return
+     */
+    public static <U extends ModelBase> ReferenceLoader<U> createReferenceLoader(final Class<? extends BaseDao<U>> daoClass, final Long id) {
+        return new ReferenceLoader<U>(null, id) {
+            @Override
+            public U loadObject() {
+                return BaracusApplicationContext.getBean(daoClass).getById(id);
+            }
+        };
+    }
+
+    /**
+     * Dirty Helper to create Lazy Reference to other objects. Simply pass the target dao and the
+     * ID and a Lazy Reference is going to be created.
+     *
+     * @param daoClass - the DAO class to use to load the referenced item. It will be resolved automatically
+     *                 in time when You access the container
+     * @param id       - the referenced ID
+     * @param <U>      - the Entity Type to load, taken from DaoClass implemetation
+     * @return - the entity referenced
+     */
+    public static <U extends ModelBase> LazyReference<U> createLazyReference(final Class<? extends BaseDao<U>> daoClass, final Long id) {
+        return new LazyReference<U>(createReferenceLoader(daoClass, id));
+    }
+
+    /**
+     * creates a lazy collection using the referenced object's dao, the field to create the
+     * lazy collection and the foreign key ID to the object collection.
+     * <p/>
+     * Example : Customer references Order 1:N with foreign key field Order.customerIdCol in Order
+     * the call would by like createLazyCollection(OrderDao.class, Order.customerIdCol, customerId);
+     * <p/>
+     * I am not using dao instances here because the instance should be resolved in situ
+     * thus this is more inperformant, it will guarantee that the container is able
+     * to remove dao bean instances when restarting it.
+     *
+     * @param daoClass        - the dao Class to be used
+     * @param foreignKeyField - the foreign key field to be used
+     * @param id              - the ID of the referencing field
+     * @param <U>             -the model class type, taken from DaoClass implementation
+     * @return Lazy reference pointing to
+     */
+    public static <U extends ModelBase> LazyCollection<U> createLazyCollection(final Class<? extends BaseDao<U>> daoClass, final Field foreignKeyField, final Long id) {
+        return new LazyCollection<U>(new LazyCollection.LazyLoader<U>() {
+            @Override
+            public List<U> loadReference() {
+                return BaracusApplicationContext.getBean(daoClass).getByField(foreignKeyField, String.valueOf(id));
+            }
+        });
+    }
+
 }
 
