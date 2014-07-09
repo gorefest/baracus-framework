@@ -4,6 +4,13 @@ VERSION 0.8.1
  (was useful to me for dto-to-model copy constructor)
 - added function to create lazy collection references by dao, id and remote field
  (same like above)
+- created optmistic locking capable entity (via version field)
+- created BaseDao.initialFromCursor factory function to make coping with ID and version
+  a little bit more flexible.
+- bugfixed ModelBase field list naming
+- bugfixed replaceBean method
+- added support for optimistic locking, useful when multiple android clients are writing
+  to one android master database.
 
 VERSION 0.8
 
