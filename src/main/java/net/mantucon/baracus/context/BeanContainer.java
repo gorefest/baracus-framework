@@ -356,7 +356,7 @@ public class BeanContainer {
     final void replaceBeanClass(Class<?> interfaceType, Class<?> implementationClass) {
         interfaceMap.remove(interfaceType);
         clazzMap.remove(interfaceType);
-        beanMap.remove(interfaceType);
+        beanMap.remove(interfaceType.getName());
         registerBeanClass(interfaceType, implementationClass);
     }
 

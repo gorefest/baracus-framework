@@ -30,4 +30,27 @@ public abstract class LegacyModelBase extends AbstractModelBase implements Ident
         super(tableName, true);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ModelBase)) {
+            return false;
+        }
+
+        ModelBase that = (ModelBase) o;
+
+        if (id != null ? !id.equals(that.id) : that.id != null) {
+            return false;
+        }
+        if (!getTableName().equals(that.getTableName())) {
+            return false;
+        }
+
+        return true;
+    }
+
+
 }
+

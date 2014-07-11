@@ -33,6 +33,8 @@ VERSION 0.8
 - added queryByExample function in order to do QBE :)
 - modified DataSetChangeAware interface, now passes the emitted class in order to be able to
   create aggregator-alike DataSetChangeAware components handling multiple entity types
+- introduced a query() function in BaseDao to unify querying for full lists
+- harmonized internal getBy...Functions
 
 
 --- DEPRECATION NOTICE ---

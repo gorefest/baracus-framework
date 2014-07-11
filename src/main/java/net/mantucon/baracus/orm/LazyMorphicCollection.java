@@ -7,16 +7,6 @@ import java.util.*;
  */
 public class LazyMorphicCollection<T, U extends T> implements List<T> {
 
-    /**
-     * Lazy Loader interface. Use this lazy loader in order to load the collection lazily after
-     * the first access.
-     *
-     * @param <U>
-     */
-    public static interface LazyLoader<U> {
-        public List<U> loadReference();
-    }
-
 
     private static enum CollectionState {
         Armed,
@@ -25,17 +15,25 @@ public class LazyMorphicCollection<T, U extends T> implements List<T> {
 
     private CollectionState collectionState = CollectionState.Armed;
 
-    private final LazyLoader<U> lazyLoader;
+    private final LazyCollection.LazyLoader<U> lazyLoader;
 
     /**
      * Constructor. A LazyCollection must be fitted with a lazy loading helper
      *
      * @param lazyLoader - the component managing the load of the collection on first access.
      */
-    public LazyMorphicCollection(LazyLoader<U> lazyLoader) {
+    public LazyMorphicCollection(LazyCollection.LazyLoader<U> lazyLoader) {
         this.lazyLoader = lazyLoader;
     }
 
+    /**
+     * Morphing Constructor. You will be assimilated.
+     *
+     * @param lazyCollection
+     */
+    public LazyMorphicCollection(LazyCollection<U> lazyCollection) {
+        this.lazyLoader = lazyCollection.lazyLoader;
+    }
 
     private ArrayList<T> referencedData = new ArrayList<T>();
 

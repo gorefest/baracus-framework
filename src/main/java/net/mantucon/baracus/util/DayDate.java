@@ -14,7 +14,8 @@ import static net.mantucon.baracus.util.DateUtil.subtractDay;
  * Time: 13:20
  * To change this template use File | Settings | File Templates.
  */
-public class DayDate extends Date {
+public class
+        DayDate extends Date {
 
     /**
      * Initializes this {@code DayDate} instance to the current time.

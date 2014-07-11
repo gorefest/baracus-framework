@@ -31,7 +31,7 @@ public class LazyCollection<T> implements List<T> {
 
     private CollectionState collectionState = CollectionState.Armed;
 
-    private final LazyLoader<T> lazyLoader;
+    final LazyLoader<T> lazyLoader;
 
     /**
      * Constructor. A LazyCollection must be fitted with a lazy loading helper

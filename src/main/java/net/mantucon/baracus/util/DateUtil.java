@@ -161,4 +161,11 @@ public class DateUtil {
         return new DayDate(net.mantucon.baracus.util.DateUtil.addOneYear(today));
     }
 
+    public static DayDate endOfTime() {
+        return new DayDate(fromEuropeanDate("31.12.9999"));
+    }
+
+    public static DayDate beginOfTime() {
+        return new DayDate(fromEuropeanDate("01.01.01"));
+    }
 }

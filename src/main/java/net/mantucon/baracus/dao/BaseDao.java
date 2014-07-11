@@ -1,3 +1,4 @@
+
 package net.mantucon.baracus.dao;
 
 import android.content.ContentValues;
@@ -162,21 +163,7 @@ public abstract class BaseDao<T extends AbstractModelBase> {
     public T getById(Long id) {
 
         RowMapper<T> rowMapper = getRowMapper();
-        Cursor c = null;
-        T result = null;
-        try {
-            c = db.query(true, rowMapper.getAffectedTable(), rowMapper.getFieldList().getFieldNames(), getIdField() + "= ?", new String[]{id.toString()}, null, null, null, null);
-            if (!c.isAfterLast() && c.moveToNext()) {
-                result = rowMapper.from(c);
-            } else {
-                result = null;
-            }
-        } finally {
-            if (c != null && !c.isClosed()) {
-                c.close();
-            }
-        }
-        return result;
+        return getUniqueByField(getIdField(), String.valueOf(id));
     }
 
     /**
@@ -195,22 +182,7 @@ public abstract class BaseDao<T extends AbstractModelBase> {
         if (nameField == null) {
             throw new UnsupportedOperationException("NAME FIELD IS NOT DEFINED FOR THIS TYPE : " + rowMapper.getAffectedTable() + ". You have to implement Your RowMapper's getNameField function properly to make use of this feature.");
         }
-        Cursor c = null;
-        T result = null;
-        try {
-
-            c = db.query(true, rowMapper.getAffectedTable(), rowMapper.getFieldList().getFieldNames(), nameField + "= ?", new String[]{name}, null, null, null, null);
-            if (!c.isAfterLast() && c.moveToNext()) {
-                result = rowMapper.from(c);
-            } else {
-                result = null;
-            }
-        } finally {
-            if (c != null && !c.isClosed()) {
-                c.close();
-            }
-        }
-        return result;
+        return getUniqueByField(nameField, name);
     }
 
     /**
@@ -259,12 +231,30 @@ public abstract class BaseDao<T extends AbstractModelBase> {
         logger.trace("get object collection by field  $1", field.fieldName);
 
         RowMapper<T> rowMapper = getRowMapper();
+        String selection = field.fieldName + "= ?";
+        String[] selectionArgs = {value};
 
+
+        List<T> result = query(selection, selectionArgs);
+
+        return result;
+    }
+
+    /**
+     * Query helper function. Encapsulates querying and delivers a proper result list
+     *
+     * @param selection     - the preconfigured where clause
+     * @param selectionArgs - the arguments for the where clause
+     * @return List<T> carrying the full resultset
+     */
+    protected List<T> query(String selection, String... selectionArgs) {
         Cursor c = null;
         List<T> result = null;
+        RowMapper<T> rowMapper = getRowMapper();
         try {
 
-            c = db.query(true, rowMapper.getAffectedTable(), rowMapper.getFieldList().getFieldNames(), field.fieldName + "= ?", new String[]{value}, null, null, null, null);
+
+            c = db.query(true, rowMapper.getAffectedTable(), rowMapper.getFieldList().getFieldNames(), selection, selectionArgs, null, null, null, null);
             if (!c.isAfterLast() && c.moveToNext()) {
                 result = iterateCursor(c);
             } else {
@@ -389,6 +379,17 @@ public abstract class BaseDao<T extends AbstractModelBase> {
                     }
                     t.setLastModificationDate(new Date());
                 }
+
+                if (item instanceof OptmisticLocking) {
+                    OptmisticLocking el = (OptmisticLocking) getById(item.getId());
+                    OptmisticLocking item1 = (OptmisticLocking) item;
+                    if (el.getVersion() != item1.getVersion()) {
+                        throw new OptimisticLockingModelBase.OptimisticLockException(this.managedClass.getSimpleName());
+                    } else {
+                        item1.setVersion(item1.getVersion() + 1);
+                    }
+                }
+
                 db.update(rowMapper.getAffectedTable(), cv, getIdField() + "= ?", new String[]{item.getId().toString()});
                 requiresInstanceChange = true;
             }
@@ -411,17 +412,17 @@ public abstract class BaseDao<T extends AbstractModelBase> {
     }
 
     /**
-     * @return the ID column. Override this, if You want to use another ID column
+     * @return the ID field. Override this, if You want to use another ID column
      * Notice: Your model must not include the AbstractModelBase-FieldList!
      * You must define the entire entity by Yourself!
      * <p/>
      * The naming technique is subject for change towards the android
      * standard (_id)!
      */
-    protected String getIdField() {
+    protected Field getIdField() {
         return ModelBase.class.isAssignableFrom(managedClass)
-                ? ModelBase.idCol.fieldName :
-                LegacyModelBase.idCol.fieldName;
+                ? ModelBase.idCol :
+                LegacyModelBase.idCol;
     }
 
     /**
@@ -609,6 +610,37 @@ public abstract class BaseDao<T extends AbstractModelBase> {
                 return BaracusApplicationContext.getBean(daoClass).getByField(foreignKeyField, String.valueOf(id));
             }
         });
+    }
+
+
+    /**
+     * little factory helper. shall coping with IDs and (if avail) Version a little bit easier.
+     * <p/>
+     * This function may be used from Your rowmapper implementation, instead of dangling all columns
+     * again and again
+     *
+     * @param c - the cursor
+     * @return an instance with ID and (if OptimisticLocking) version id prefilled
+     */
+    public T initialFromCursor(Cursor c) {
+        T instance = null;
+        try {
+            instance = managedClass.newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException("Instantiation of " + managedClass.getName() + " failed. Please ensure that the class has a PUBLIC DEFAULT CONSTRUCTOR!");
+        }
+
+        if (instance.isOldStyle()) {
+            instance.setId(c.getLong(LegacyModelBase.idCol.fieldIndex));
+        } else {
+            instance.setId(c.getLong(ModelBase.idCol.fieldIndex));
+        }
+
+        if (OptmisticLocking.class.isAssignableFrom(managedClass)) {
+            ((OptmisticLocking) instance).setVersion(c.getInt(OptimisticLockingModelBase.versionCol.fieldIndex));
+        }
+
+        return instance;
     }
 
 }

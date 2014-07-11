@@ -48,27 +48,6 @@ public abstract class AbstractModelBase implements Identifiable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof AbstractModelBase)) {
-            return false;
-        }
-
-        AbstractModelBase that = (AbstractModelBase) o;
-
-        if (id != null ? !id.equals(that.id) : that.id != null) {
-            return false;
-        }
-        if (!tableName.equals(that.tableName)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + tableName.hashCode();
