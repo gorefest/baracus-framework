@@ -21,10 +21,7 @@ import net.mantucon.baracus.validation.ValidationFactory;
 import net.mantucon.baracus.validation.Validator;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.  <br>
@@ -797,6 +794,23 @@ public abstract class BaracusApplicationContext extends Application {
      */
     public static void setApplicationContextInitializer(ApplicationContextInitializer applicationContextInitializer) {
         BaracusApplicationContext.applicationContextInitializer = applicationContextInitializer;
+    }
+
+    /**
+     * finds all impementing singleton beans of the passed superclass and returns them
+     *
+     * @param superclass - the superclass to look for
+     * @param <T>        - the type parameter of the superclass
+     * @return a List<T> containing all found instances
+     */
+    public static <T> List<T> getBeansOfType(Class<T> superclass) {
+        List<T> result = new ArrayList<T>();
+        for (Object o : beanContainer.beanMap.values()) {
+            if (superclass.isAssignableFrom(o.getClass())) {
+                result.add((T) o);
+            }
+        }
+        return result;
     }
 
 }

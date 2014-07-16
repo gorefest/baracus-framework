@@ -14,6 +14,8 @@ VERSION 0.8.1
 - bugfixed replaceBean method
 - added support for optimistic locking, useful when multiple android clients are writing
   to one android master database.
+- added a locator function BaracusApplicationContext.getBeansOfType to find all instances
+  implementing a certain class.
 
 VERSION 0.8
 

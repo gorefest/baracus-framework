@@ -8,12 +8,7 @@ import java.util.*;
 public class LazyMorphicCollection<T, U extends T> implements List<T> {
 
 
-    private static enum CollectionState {
-        Armed,
-        Loaded
-    }
-
-    private CollectionState collectionState = CollectionState.Armed;
+    private LazyCollection.CollectionState collectionState = LazyCollection.CollectionState.Armed;
 
     private final LazyCollection.LazyLoader<U> lazyLoader;
 
@@ -45,8 +40,8 @@ public class LazyMorphicCollection<T, U extends T> implements List<T> {
      */
     private void checkReferencedData() {
         synchronized (collectionState) {
-            if (collectionState == CollectionState.Armed) {
-                collectionState = CollectionState.Loaded;
+            if (collectionState == LazyCollection.CollectionState.Armed) {
+                collectionState = LazyCollection.CollectionState.Loaded;
                 referencedData.addAll(lazyLoader.loadReference());
             }
         }
@@ -188,4 +183,7 @@ public class LazyMorphicCollection<T, U extends T> implements List<T> {
         return referencedData.remove(object);
     }
 
+    public LazyCollection.CollectionState getCollectionState() {
+        return collectionState;
+    }
 }

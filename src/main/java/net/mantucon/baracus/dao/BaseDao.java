@@ -580,10 +580,11 @@ public abstract class BaseDao<T extends AbstractModelBase> {
      *                 in time when You access the container
      * @param id       - the referenced ID
      * @param <U>      - the Entity Type to load, taken from DaoClass implemetation
-     * @return - the entity referenced
+     * @return - the entity referenced or NullReference if passed ID is null
      */
-    public static <U extends ModelBase> LazyReference<U> createLazyReference(final Class<? extends BaseDao<U>> daoClass, final Long id) {
-        return new LazyReference<U>(createReferenceLoader(daoClass, id));
+    public static <U extends ModelBase> Reference<U> createLazyReference(final Class<? extends BaseDao<U>> daoClass, final Long id) {
+        return id == null ? new NullReference<U>() :
+                new LazyReference<U>(createReferenceLoader(daoClass, id));
     }
 
     /**

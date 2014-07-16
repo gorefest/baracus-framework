@@ -24,7 +24,7 @@ public class LazyCollection<T> implements List<T> {
     }
 
 
-    private static enum CollectionState {
+    static enum CollectionState {
         Armed,
         Loaded
     }
