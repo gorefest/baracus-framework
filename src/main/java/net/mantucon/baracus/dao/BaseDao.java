@@ -353,7 +353,6 @@ public abstract class BaseDao<T extends AbstractModelBase> {
         boolean requiresInstanceChange = false;
 
         RowMapper<T> rowMapper = getRowMapper();
-        ContentValues cv = rowMapper.getContentValues(item);
 
         boolean localTransaction = handle == null;
         if (localTransaction) {
@@ -361,12 +360,14 @@ public abstract class BaseDao<T extends AbstractModelBase> {
         }
 
         try {
+
             if (item.getId() == null || item.isTransient()) {
                 if (item instanceof Timestamped) {
                     Timestamped t = (Timestamped) item;
                     t.setCreationDate(new Date());
                     t.setLastModificationDate(new Date());
                 }
+                ContentValues cv = rowMapper.getContentValues(item);
                 long key = db.insert(rowMapper.getAffectedTable(), null, cv);
                 item.setId(key);
                 item.setTransient(false);
@@ -389,6 +390,8 @@ public abstract class BaseDao<T extends AbstractModelBase> {
                         item1.setVersion(item1.getVersion() + 1);
                     }
                 }
+
+                ContentValues cv = rowMapper.getContentValues(item);
 
                 db.update(rowMapper.getAffectedTable(), cv, getIdField() + "= ?", new String[]{item.getId().toString()});
                 requiresInstanceChange = true;
@@ -528,6 +531,12 @@ public abstract class BaseDao<T extends AbstractModelBase> {
      */
     public List<T> queryByExample(T example, boolean withWildCard) {
         ContentValues cv = getRowMapper().getContentValues(example);
+
+        // if optmistic locking, do not regard the version field
+        if (example instanceof OptimisticLockingModelBase) {
+            cv.remove(OptimisticLockingModelBase.versionCol.fieldName);
+        }
+
         Set<Map.Entry<String, Object>> entries = cv.valueSet();
         String[] args = new String[entries.size()];
         StringBuilder clause = new StringBuilder();

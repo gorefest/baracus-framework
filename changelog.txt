@@ -16,6 +16,7 @@ VERSION 0.8.1
   to one android master database.
 - added a locator function BaracusApplicationContext.getBeansOfType to find all instances
   implementing a certain class.
+- bugfixed loss of timestamp info in BaseDao.save()
 
 VERSION 0.8
 
