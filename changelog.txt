@@ -2,6 +2,10 @@
 VERSION 0.8.1
 
 - added NullReference in ORM to avoid NPE handling on nullified References
+- added Popup macro
+- bugfixed query-function (double iteration)
+- added generic arrify function to BaseDao to make collections become an array on demand
+
 
 - added function to create lazy object reference by dao and id to application context
  (was useful to me for dto-to-model copy constructor)

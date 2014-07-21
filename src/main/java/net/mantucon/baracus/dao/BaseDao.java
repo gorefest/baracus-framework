@@ -9,6 +9,7 @@ import net.mantucon.baracus.context.BaracusApplicationContext;
 import net.mantucon.baracus.orm.*;
 import net.mantucon.baracus.util.Logger;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -252,14 +253,8 @@ public abstract class BaseDao<T extends AbstractModelBase> {
         List<T> result = null;
         RowMapper<T> rowMapper = getRowMapper();
         try {
-
-
             c = db.query(true, rowMapper.getAffectedTable(), rowMapper.getFieldList().getFieldNames(), selection, selectionArgs, null, null, null, null);
-            if (!c.isAfterLast() && c.moveToNext()) {
-                result = iterateCursor(c);
-            } else {
-                result = null;
-            }
+            result = iterateCursor(c);
         } finally {
             if (c != null && !c.isClosed()) {
                 c.close();
@@ -652,6 +647,19 @@ public abstract class BaseDao<T extends AbstractModelBase> {
 
         return instance;
     }
+
+    /**
+     * make an array out of the passed list.
+     *
+     * @param list - the list of elements to be converted to an array
+     * @return the array containing the items
+     */
+    public T[] arrify(List<T> list) {
+        return list != null && !list.isEmpty()
+                ? list.toArray((T[]) Array.newInstance(managedClass, list.size()))
+                : (T[]) Array.newInstance(managedClass, 0);
+    }
+
 
 }
 
