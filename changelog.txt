@@ -1,6 +1,9 @@
 
 VERSION 0.8.1
 
+- added DataUtil for simple Collection -> Map transformations
+- added list based delete/save functions
+
 - added NullReference in ORM to avoid NPE handling on nullified References
 - added Popup macro
 - bugfixed query-function (double iteration)
@@ -21,6 +24,8 @@ VERSION 0.8.1
 - added a locator function BaracusApplicationContext.getBeansOfType to find all instances
   implementing a certain class.
 - bugfixed loss of timestamp info in BaseDao.save()
+
+
 
 VERSION 0.8
 

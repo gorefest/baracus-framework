@@ -649,6 +649,24 @@ public abstract class BaseDao<T extends AbstractModelBase> {
     }
 
     /**
+     * saves or updates a list of items within one transaction
+     *
+     * @param items - the list of items
+     */
+    public void save(List<T> items) {
+        TxHandle txHandle = getTransaction();
+        try {
+            for (T item : items) {
+                save(item, txHandle);
+            }
+            txHandle.commit();
+        } catch (Exception e) {
+            txHandle.rollback();
+        }
+
+    }
+
+    /**
      * make an array out of the passed list.
      *
      * @param list - the list of elements to be converted to an array
@@ -660,6 +678,37 @@ public abstract class BaseDao<T extends AbstractModelBase> {
                 : (T[]) Array.newInstance(managedClass, 0);
     }
 
+    /**
+     * performs a delete operation on the db within one transaction
+     *
+     * @param models - the list
+     * @return number of deleted items || -1 in case of error
+     */
+    public int delete(final List<T> models) {
+        int result = 0;
+
+        final TxHandle txHandle = getTransaction();
+
+        try {
+            for (AbstractModelBase abstractModelBase : models) {
+                if (!abstractModelBase.isTransient()) {
+                    Long id = abstractModelBase.getId();
+                    result += deleteById(id);
+                    BaracusApplicationContext.emitDeleteEvent(managedClass);
+                    abstractModelBase.setTransient(true);
+                } else {
+                    logger.warn("Warning. You tried to delete a transient entity of type $1. No operation performed!.", abstractModelBase.getClass().getName());
+                    result = -1;
+                }
+            }
+            txHandle.commit();
+        } catch (Exception e) {
+            txHandle.rollback();
+            result = -1;
+        }
+
+        return result;
+    }
 
 }
 
