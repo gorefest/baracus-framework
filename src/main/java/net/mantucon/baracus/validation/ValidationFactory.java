@@ -17,11 +17,11 @@ import java.util.Map;
 import static net.mantucon.baracus.util.StringUtil.*;
 
 /**
- * Created with IntelliJ IDEA.
  * User: marcus
  * Date: 24.09.13
- * Time: 06:57
- * To change this template use File | Settings | File Templates.
+ * <p/>
+ * Validation factory used to register validators. You can use the ApplicationContext
+ * to call this methods statically (delegated thru BeanContainer).
  */
 @Bean
 public class ValidationFactory implements Initializeable, Destroyable {

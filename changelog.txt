@@ -1,3 +1,7 @@
+VERSION 0.8.2
+
+- added the installation of the baracus-framework-${version}.jar into the deployment. You can use this in multi-module project to have the framework dependencies in sublibs without clashing "R".
+- improved javadocs
 
 VERSION 0.8.1
 

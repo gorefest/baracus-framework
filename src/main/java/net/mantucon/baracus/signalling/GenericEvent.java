@@ -3,9 +3,10 @@ package net.mantucon.baracus.signalling;
 /**
  * Created with IntelliJ IDEA.
  * User: marcus
- * Date: 27.06.13
- * Time: 19:13
- * To change this template use File | Settings | File Templates.
+ * <p/>
+ * Generic event. use implementations of this interface to fire generic events
+ * you may register listeners to generic events using the ApplicationContext's
+ * registerGenericListener function
  */
 public interface GenericEvent {
 }

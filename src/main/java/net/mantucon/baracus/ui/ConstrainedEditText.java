@@ -3,7 +3,6 @@ package net.mantucon.baracus.ui;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.EditText;
-import android.widget.TextView;
 import net.mantucon.baracus.context.BaracusApplicationContext;
 import net.mantucon.baracus.util.Logger;
 import net.mantucon.baracus.validation.ConstrainedView;
@@ -11,9 +10,10 @@ import net.mantucon.baracus.validation.ConstrainedView;
 /**
  * Created with IntelliJ IDEA.
  * User: marcus
- * Date: 20.09.13
- * Time: 07:54
- * To change this template use File | Settings | File Templates.
+ * EditText which can be fitted with constraints. This element is an
+ * implementation of ConstrainedView. To create your own constrained elements
+ * simply inherit the control you want to extend with constraints and implement
+ * the ConstrainedView interface.
  */
 public class ConstrainedEditText extends EditText implements ConstrainedView<String> {
 

@@ -12,6 +12,8 @@ import android.view.View;
  * use a bean as a validator instead, make sure, you use the createPrototypeBean from
  * the ApplicationContext to instantiate it and get injections done. It is disregarded
  * to use Singleton Beans as Validators!
+ * <p/>
+ * For more details on validation, check the Baracus blog's form validation tutorials.
  */
 public interface Validator<T> {
 

@@ -3,9 +3,7 @@ package net.mantucon.baracus.validation;
 /**
  * Created with IntelliJ IDEA.
  * User: marcus
- * Date: 24.09.13
- * Time: 06:46
- * To change this template use File | Settings | File Templates.
+ * Interface used by the validation factory to listen to
  */
 public interface ConstrainedView<T> {
     T getCurrentValue();

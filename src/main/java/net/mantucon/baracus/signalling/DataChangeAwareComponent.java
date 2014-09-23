@@ -13,5 +13,11 @@ import net.mantucon.baracus.orm.AbstractModelBase;
  * on the recordset you are listening to.
  */
 public interface DataChangeAwareComponent<T extends AbstractModelBase> {
+
+    /**
+     * change callback function. is fired if Baracus detects the change of an instance
+     *
+     * @param changedInstance - the instance which has changed
+     */
     public void onChange(T changedInstance);
 }
