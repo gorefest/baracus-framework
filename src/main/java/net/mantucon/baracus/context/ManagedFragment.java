@@ -39,7 +39,7 @@ public abstract class ManagedFragment extends Fragment {
     }
 
     /**
-     * enables the validation of the view onFocusChanged
+     * enables the validation of the view onFocusChanged event
      * If you want Your View to
      * be able to receive a validation callback - e.g. in order to manage the
      * visibility of an OK-Button or sth. - Your View must implement
@@ -51,4 +51,22 @@ public abstract class ManagedFragment extends Fragment {
     public void enableFocusChangeBasedValidation() {
         BaracusApplicationContext.registerValidationListener(this.view);
     }
+
+
+    /**
+     * enables the validation of the view onFocusChanged event
+     * If you want Your View to
+     * be able to receive a validation callback - e.g. in order to manage the
+     * visibility of an OK-Button or sth. - Your View must implement
+     * the @see ValidatableView interface in order to receive a validation
+     * notification.
+     *
+     * @param v - the underlying view, which will be set on the this.view variable
+     *
+     */
+    public void enableFocusChangeBasedValidation(View v) {
+        this.view = v;
+        enableFocusChangeBasedValidation();
+    }
+
 }

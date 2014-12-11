@@ -9,4 +9,9 @@
        <attr name="validatedBy" format="string"/>
     </declare-styleable>
 
+    <declare-styleable name="ConstrainedSpinner">
+        <attr name="validatedSpinnerBy" format="string"/>
+    </declare-styleable>
+
+
 </resources>

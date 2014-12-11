@@ -4,12 +4,11 @@
 
     <groupId>org.baracus</groupId>
     <artifactId>baracus-framework</artifactId>
-    <version>0.8.2</version>
+    <version>0.8.4-SNAPSHOT</version>
     <packaging>apklib</packaging>
 
     <name>baracus-framework</name>
-    <description>The BARACUS Framework for lightweight DI, ORM and other cool stuff for Your Android application
-    </description>
+    <description>The BARACUS Framework for lightweight DI, ORM and other cool stuff for Your Android application</description>
 
     <url>http://www.baracus.org</url>
 

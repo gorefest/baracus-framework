@@ -1,3 +1,11 @@
+VERSION 0.8.3
+
+- bugfixed bad transaction handling in BaseDao.saveAll
+- added method enableFocusChangeBasedValidation(); with view Parameter
+- added constrained spinner. due to a plugin problem this version's ui element has got a different validation-tag
+- added the capability to have postConstruct methods in prototype beans
+
+
 VERSION 0.8.2
 
 - added the installation of the baracus-framework-${version}.jar into the deployment. You can use this in multi-module project to have the framework dependencies in sublibs without clashing "R".

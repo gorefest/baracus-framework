@@ -78,10 +78,14 @@ public class BeanContainer {
         Set<Object> allBeans = new HashSet<Object>(beanMap.values()); // avoid multiple execution of postconstruct
 
         for (Object o : allBeans) {
-            if (o instanceof Initializeable) {
-                logger.debug("Running Post Construction method on $1", o.getClass().getName());
-                ((Initializeable) o).postConstruct();
-            }
+            performPostConstructOn(o);
+        }
+    }
+
+    void performPostConstructOn(Object o) {
+        if (o instanceof Initializeable) {
+            logger.debug("Running Post Construction method on $1", o.getClass().getName());
+            ((Initializeable) o).postConstruct();
         }
     }
 

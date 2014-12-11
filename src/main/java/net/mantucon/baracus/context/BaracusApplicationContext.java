@@ -763,6 +763,7 @@ public abstract class BaracusApplicationContext extends Application {
         try {
             T instance = beanContainer.instantiatePojo(clazz);
             performInjectionsOn(instance);
+            beanContainer.performPostConstructOn(instance);
             return instance;
         } catch (Exception e) {
             throw new Exceptions.IntantiationException(e);

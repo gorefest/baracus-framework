@@ -474,7 +474,7 @@ public abstract class BaseDao<T extends AbstractModelBase> {
         final TxHandle txHandle = localTransaction ? getTransaction() : handle;
         try {
             for (T item : list) {
-                save(item, handle);
+                save(item, localTransaction ? txHandle : handle);
             }
 
             if (localTransaction) {
