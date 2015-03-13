@@ -4,7 +4,7 @@
 
     <groupId>org.baracus</groupId>
     <artifactId>baracus-framework</artifactId>
-    <version>0.8.4-SNAPSHOT</version>
+    <version>0.9-SNAPSHOT</version>
     <packaging>apklib</packaging>
 
     <name>baracus-framework</name>
@@ -148,7 +148,7 @@
             <id>windows</id>
             <properties>
                 <platform.version>4.0.1.2</platform.version>
-                <android.sdk.path>C:/adt-bundle-windows-x86-20130219/sdk</android.sdk.path>
+                <android.sdk.path>C:\Entwicklung\android-sdk\</android.sdk.path>
                 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
                 <docs.directory>C:/Temp/apidocs</docs.directory>
             </properties>

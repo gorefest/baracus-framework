@@ -1,3 +1,9 @@
+VERSION 0.9
+
+- Package moved from net.mantucon.baracus to org.baracus. Simply replacing all net.mantucon.baracus by org.baracus in your projects should do the job.
+- added a few unit tests for quality assurance
+    - DataUtil (List2Map Transformator) now fully tested
+
 VERSION 0.8.3
 
 - bugfixed bad transaction handling in BaseDao.saveAll
