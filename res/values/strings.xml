@@ -6,4 +6,7 @@
     <string name="numberIsSmallerThanZero">Number must be greater than zero</string>
     <string name="dateFromNow">The date must not be before today</string>
 
+    <string name="yes">yes</string>
+    <string name="no">no</string>
+
 </resources>

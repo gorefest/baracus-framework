@@ -213,7 +213,11 @@ public abstract class BaseDao<T extends AbstractModelBase> {
             }
         } finally {
             if (c != null && !c.isClosed()) {
-                c.close();
+                try {
+                    c.close();
+                } catch(Exception e) {
+                    // Do nothing
+                }
             }
         }
         return result;

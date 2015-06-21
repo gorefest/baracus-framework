@@ -144,7 +144,7 @@ public class BeanContainer {
                     } catch (IllegalAccessException e) {
                         throw new InjectionException("OMG OpenHelper injection issued a major clusterfuck", e);
                     }
-                } else if (type.equals(Context.class.getName())) {
+                } else if (!(o instanceof ManagedActivity) && type.equals(Context.class.getName())) {
                     field.setAccessible(true);
                     logger.debug("$1.$2 candidate is $3", clazz.getName(), field.getName(), clazz2.getName());
                     try {
@@ -408,9 +408,9 @@ public class BeanContainer {
     }
 
     static void printStats() {
-        logger.info("EXSTING $1", existingActivitiesMap.size());
-        logger.info("ACTIVE $1", activeActivitiesMap.size());
-        logger.info("RESUMED $1", pausedActivitiesMap.size());
+        logger.debug("EXSTING $1", existingActivitiesMap.size());
+        logger.debug("ACTIVE $1", activeActivitiesMap.size());
+        logger.debug("RESUMED $1", pausedActivitiesMap.size());
     }
 
 

@@ -357,6 +357,11 @@ public abstract class BaracusApplicationContext extends Application {
         deleteListeners.put(clazz, dac);
     }
 
+    public static synchronized void unregisterDeleteListener(Class<? extends AbstractModelBase> clazz) {
+        logger.debug("Unregister DeleteListener for class $2", clazz.getSimpleName());
+        deleteListeners.remove(clazz);
+    }
+
     /**
      * emit a delete event on the passed model class
      *

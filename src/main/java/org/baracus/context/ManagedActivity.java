@@ -13,6 +13,10 @@ public class ManagedActivity extends Activity {
 
     protected View underlyingView;
 
+    public ManagedActivity() {
+        BaracusApplicationContext.performInjectionsOn(this);
+    }
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);

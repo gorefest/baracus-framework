@@ -25,6 +25,9 @@ public class DateUtil {
         // Protection Constructor
     }
 
+    /**
+     * Simple Exception to encapsulate date exceptions
+     */
     public static class DateFormatException extends RuntimeException {
         public DateFormatException(Throwable throwable) {
             super(throwable);

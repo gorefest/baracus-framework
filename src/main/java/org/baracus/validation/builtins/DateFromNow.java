@@ -23,7 +23,10 @@ import static org.baracus.util.StringUtil.toArray;
  * Time: 08:47
  * <p/>
  * verifies that the passed String is a number greater than zero
+ *
+ * @Deprecated Will be replace by FutureDate
  */
+@Deprecated
 public class DateFromNow extends AbstractValidator<String> {
 
     @Override
