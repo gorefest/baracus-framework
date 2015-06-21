@@ -1,3 +1,9 @@
+VERSION 0.9.1
+
+- Added a simplified yes-no-macro to have a code-saving, comprehensive capabilities to create yes-no-dialogboxes in Popup class
+- Added a unregister call for clean deleteListener deregistration
+- Made ManagedActivity auto injecting to avoid NPE on access on injected beans after device rotate
+
 VERSION 0.9
 
 - Package moved from net.mantucon.baracus to org.baracus. Simply replacing all net.mantucon.baracus by org.baracus in your projects should do the job.
