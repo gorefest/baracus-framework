@@ -278,6 +278,31 @@ public abstract class BaracusApplicationContext extends Application {
     }
 
     /**
+     * replace the bean container instance of a managed activity. this is necessary because of
+     * hidden constructor calls on device rotation etc.
+     *
+     * @param element - the element to be replaced.
+     */
+    public final static void replaceManagedActivityImplementation(ManagedActivity element) {
+        beanContainer.removeBean(element.getClass());
+        beanContainer.holdBean(element.getClass(), element);
+        beanContainer.performInjections();
+    }
+
+
+    /**
+     * replace the bean container instance of a managed fragment. this is necessary because of
+     * hidden constructor calls on device rotation etc.
+     *
+     * @param element - the element to be replaced.
+     */
+    public final static void replaceManagedFragmentImplementation(ManagedFragment element) {
+        beanContainer.removeBean(element.getClass());
+        beanContainer.holdBean(element.getClass(), element);
+        beanContainer.performInjections();
+    }
+
+    /**
      * resolve a string and replace parameters by passed strings
      * e.g. resolveString(R.string.foo,4711)
      *

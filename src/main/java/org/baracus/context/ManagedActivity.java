@@ -15,6 +15,7 @@ public class ManagedActivity extends Activity {
 
     public ManagedActivity() {
         BaracusApplicationContext.performInjectionsOn(this);
+        BaracusApplicationContext.replaceManagedActivityImplementation(this);
     }
 
     @Override

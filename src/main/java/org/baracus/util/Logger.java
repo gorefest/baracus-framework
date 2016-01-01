@@ -6,8 +6,20 @@ import android.util.Log;
  * Created by IntelliJ IDEA.
  * User: mnt
  * Date: 07.02.12
- * Time: 19:21
- * very basic logger providin a log4j style combined with a slf4j vararg styled logging function
+ *
+ * logger component providing a log4j logging combined with a slf4j vararg styled logging function
+ *
+ * Usage :
+ *
+ * {@code
+ *  ...
+ *  Logging configuration = new LoggingConfiguration();
+ *  configuration.setLogLevel("org", Logger.Level.DEBUG);
+ *  Logger.setLoggingConfiguration(configuration);
+ *  Logger.debug("$1 times $2 makes $3", 3,4,12);
+ *
+ * }
+ *
  */
 public class Logger {
 
@@ -23,7 +35,9 @@ public class Logger {
         TRACE,
     }
 
-    private static Level level = Level.DEBUG;
+    private static LoggingConfiguration loggingConfiguration = new LoggingConfiguration();
+
+    private final Class<?> targetClass;
 
     private static LogTarget logTarget = new AndroidLogger();
 
@@ -109,59 +123,53 @@ public class Logger {
             }
         }
 
-        @Override
         public void debug(String tag, String msg, Throwable t) {
             dump(tag, msg, t);
         }
 
-        @Override
         public void debug(String tag, String msg) {
             dump(tag, msg, null);
         }
 
-        @Override
         public void info(String tag, String msg, Throwable t) {
             dump(tag, msg, t);
         }
 
-        @Override
         public void info(String tag, String msg) {
             dump(tag, msg, null);
         }
 
-        @Override
         public void warn(String tag, String msg, Throwable t) {
             dump(tag, msg, t);
         }
 
-        @Override
         public void warn(String tag, String msg) {
             dump(tag, msg, null);
         }
 
-        @Override
         public void error(String tag, String msg, Throwable t) {
             dump(tag, msg, t);
         }
 
-        @Override
         public void error(String tag, String msg) {
             dump(tag, msg, null);
         }
 
-        @Override
         public void trace(String tag, String msg, Throwable t) {
             dump(tag, msg, t);
         }
 
-        @Override
         public void trace(String tag, String msg) {
             dump(tag, msg, null);
         }
     }
 
 
-    private final String processMessageArgs(final String message, final Object... args) {
+    public static void setLogTarget(LogTarget logTarget) {
+        Logger.logTarget = logTarget;
+    }
+
+    final String processMessageArgs(final String message, final Object... args) {
         String result = message;
         for (int i = 0; i < args.length; ++i) {
             result = result.replace("$" + (i + 1), String.valueOf(args[i]));
@@ -169,15 +177,35 @@ public class Logger {
         return result;
     }
 
-    public Logger(String loggerId) {
-        this.loggerId = loggerId;
+    /**
+     * Constructor. Pass class to log
+     *
+     * @param classToLog
+     */
+    public Logger(Class<?> classToLog) {
+        this.loggerId = classToLog.getSimpleName();
+        this.targetClass = classToLog;
         log(Level.DEBUG, loggerId + " was registered");
     }
 
-    public Logger(Class<?> classToLog) {
-        this(classToLog.getSimpleName());
+    /**
+     * set a logging configuration for the logger. typically, this is going to be done
+     * when the application is started (e.g. when the application context is built)
+     *
+     * @param loggingConfiguration - the logging configuration
+     */
+    public static void setLoggingConfiguration(LoggingConfiguration loggingConfiguration) {
+        Logger.loggingConfiguration = loggingConfiguration;
     }
 
+    /**
+     * log debug message. use $1 ... $n to declare the parameters
+     *
+     * e.g. "$1 elements have been processed"
+     *
+     * @param message
+     * @param args
+     */
     public void debug(final String message, final Object... args) {
         if (!isLoggable(Level.DEBUG)) {
             return;
@@ -271,19 +299,7 @@ public class Logger {
 
 
     private boolean isLoggable(Level l) {
-        switch (level) {
-            case TRACE:
-                return true;
-            case DEBUG:
-                return !l.equals(Level.TRACE);
-            case INFO:
-                return !l.equals(Level.TRACE) && !l.equals(Level.DEBUG);
-            case WARN:
-                return l.equals(Level.WARN) || l.equals(Level.ERROR);
-            case ERROR:
-                return l.equals(Level.ERROR);
-        }
-        return false;
+        return loggingConfiguration.isLoggable(this.targetClass.getPackage(), l);
     }
 
 

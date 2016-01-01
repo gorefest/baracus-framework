@@ -23,6 +23,7 @@ public abstract class ManagedFragment extends Fragment {
 
     public ManagedFragment() {
         BaracusApplicationContext.performInjectionsOn(this);
+        BaracusApplicationContext.replaceManagedFragmentImplementation(this);
     }
 
     @Override
