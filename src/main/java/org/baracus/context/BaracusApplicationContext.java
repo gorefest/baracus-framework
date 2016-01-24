@@ -284,9 +284,11 @@ public abstract class BaracusApplicationContext extends Application {
      * @param element - the element to be replaced.
      */
     public final static void replaceManagedActivityImplementation(ManagedActivity element) {
-        beanContainer.removeBean(element.getClass());
-        beanContainer.holdBean(element.getClass(), element);
-        beanContainer.performInjections();
+        if (init) {
+            beanContainer.removeBean(element.getClass());
+            beanContainer.holdBean(element.getClass(), element);
+            beanContainer.performInjections();
+        }
     }
 
 
@@ -297,9 +299,11 @@ public abstract class BaracusApplicationContext extends Application {
      * @param element - the element to be replaced.
      */
     public final static void replaceManagedFragmentImplementation(ManagedFragment element) {
-        beanContainer.removeBean(element.getClass());
-        beanContainer.holdBean(element.getClass(), element);
-        beanContainer.performInjections();
+        if (init) {
+            beanContainer.removeBean(element.getClass());
+            beanContainer.holdBean(element.getClass(), element);
+            beanContainer.performInjections();
+        }
     }
 
     /**
