@@ -138,7 +138,7 @@ public abstract class BaseDao<T extends AbstractModelBase> {
         int result = 0;
         if (!model.isTransient()) {
             Long id = model.getId();
-            result = deleteById(id);
+            result = performDeleteById(id);
             BaracusApplicationContext.emitDeleteEvent(managedClass);
             model.setTransient(true);
         } else {
@@ -148,7 +148,20 @@ public abstract class BaseDao<T extends AbstractModelBase> {
         return result;
     }
 
+
+    /**
+     * deletes an element by its ID
+     *
+     * @param id - the ID of the element to delete
+     * @return number of deleted rows
+     */
     public int deleteById(Long id) {
+        int i = performDeleteById(id);
+        BaracusApplicationContext.emitDeleteEvent(managedClass);
+        return i;
+    }
+
+    private int performDeleteById(Long id) {
         int result;
         result = db.delete(getRowMapper().getAffectedTable(), getIdField() + " = ?", new String[]{id.toString()});
         return result;
@@ -696,7 +709,7 @@ public abstract class BaseDao<T extends AbstractModelBase> {
             for (AbstractModelBase abstractModelBase : models) {
                 if (!abstractModelBase.isTransient()) {
                     Long id = abstractModelBase.getId();
-                    result += deleteById(id);
+                    result += performDeleteById(id);
                     BaracusApplicationContext.emitDeleteEvent(managedClass);
                     abstractModelBase.setTransient(true);
                 } else {

@@ -1,3 +1,7 @@
+VERSION 0.9.3
+- Bugfix missing event on deleteById
+- Bugfix replaceManagedActivity caused NPE
+
 VERSION 0.9.2
 
 - Improved Logging with new logging configuration etc
@@ -9,7 +13,7 @@ VERSION 0.9.1
 - Added a unregister call for clean deleteListener deregistration
 - Made ManagedActivity auto injecting to avoid NPE on access on injected beans after device rotate
 
-VERSION 0.9
+VERSION 0
 
 - Package moved from net.mantucon.baracus to org.baracus. Simply replacing all net.mantucon.baracus by org.baracus in your projects should do the job.
 - added a few unit tests for quality assurance
