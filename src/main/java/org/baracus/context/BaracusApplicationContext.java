@@ -145,6 +145,7 @@ public abstract class BaracusApplicationContext extends Application {
 
     public static synchronized void initApplicationContext() {
         if (!init) {
+            init = true;
             beanContainer.createInstances();
 //            beanContainer.holdBean(Context.class, __instance);   // Inject a context simply
             beanContainer.performInjections();
@@ -158,8 +159,6 @@ public abstract class BaracusApplicationContext extends Application {
                 beanContainer.performInjection(applicationContextInitializer);
                 applicationContextInitializer.afterContextIsBuilt();
             }
-
-            init = true;
         }
     }
 

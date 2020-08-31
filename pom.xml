@@ -1,12 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.baracus</groupId>
     <artifactId>baracus-framework</artifactId>
-    <version>0.9.3</version>
-    <packaging>apklib</packaging>
-
+    <version>1.0.0</version>
+    <packaging>aar</packaging>
     <name>baracus-framework</name>
     <description>The BARACUS Framework for lightweight DI, ORM and other cool stuff for Your Android application</description>
 
@@ -45,6 +43,20 @@
         </developer>
     </developers>
 
+    <distributionManagement>
+        <repository>
+            <id>repo.crowdcode.io</id>
+            <name>repo.crowdcode.io</name>
+            <url>https://repo.crowdcode.io/repository/releases/</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>repo.crowdcode.io</id>
+            <name>repo.crowdcode.io</name>
+            <url>https://repo.crowdcode.io/repository/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>com.google.android</groupId>
@@ -53,117 +65,40 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.6.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.21.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <outputDirectory>${project.build.directory}/javadoc</outputDirectory>
-                    <reportOutputDirectory>${project.build.directory}/javadoc</reportOutputDirectory>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <configuration>
-                    <outputDirectory>${docs.directory}/${project.version}</outputDirectory>
-                    <resources>
-                        <resource>
-                            <directory>${project.build.directory}/javadoc/apidocs/</directory>
-                            <includes>
-                                <include>**/*</include>
-                            </includes>
-                        </resource>
-                    </resources>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <phase>
-                            site
-                        </phase>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-                <artifactId>android-maven-plugin</artifactId>
-                <version>3.8.2</version>
-                <configuration>
-                    <androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
-                    <assetsDirectory>${project.basedir}/assets</assetsDirectory>
-                    <resourceDirectory>${project.basedir}/res</resourceDirectory>
-                    <nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory>
-                    <sdk>
-                        <platform>14</platform>
-                    </sdk>
-                    <undeployBeforeDeploy>true</undeployBeforeDeploy>
-                </configuration>
-                <extensions>true</extensions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.7</version>
-                <executions>
-                    <execution>
-                        <id>attach-artifacts</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attach-artifact</goal>
-                        </goals>
-                        <configuration>
-                            <artifacts>
-                                <artifact>
-                                    <file>${project.build.directory}/baracus-framework-${project.version}.jar</file>
-                                    <type>jar</type>
-                                </artifact>
-                            </artifacts>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-
-    </build>
 
     <profiles>
         <profile>
             <id>windows</id>
             <properties>
                 <platform.version>4.0.1.2</platform.version>
-                <android.sdk.path>C:\Entwicklung\android-sdk\</android.sdk.path>
+                <android.sdk.path>c:\entwicklung\jdk\android-sdk</android.sdk.path>
                 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
                 <docs.directory>C:/Temp/apidocs</docs.directory>
             </properties>
@@ -190,22 +125,12 @@
         </profile>
 
         <profile>
-            <id>deployment-nexus-mantucon</id>
-            <distributionManagement>
-                <!-- Publish versioned releases here -->
-                <repository>
-                    <id>mantucon-repo</id>
-                    <name>MANTUCON Release NEXUS</name>
-                    <url>http://www.mantucon.net/nexus/content/repositories/releases</url>
-                </repository>
-
-                <!-- Publish snapshots here -->
-                <snapshotRepository>
-                    <id>mantucon-repo</id>
-                    <name>MANTUCON Snapshot NEXUS</name>
-                    <url>http://www.mantucon.net/nexus/content/repositories/snapshots</url>
-                </snapshotRepository>
-            </distributionManagement>
+            <id>mac</id>
+            <properties>
+                <platform.version>4.0.1.2</platform.version>
+                <android.sdk.path>/Users/heiko/Library/Android/sdk</android.sdk.path>
+                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+            </properties>
         </profile>
 
         <profile>
@@ -230,33 +155,26 @@
         </profile>
     </profiles>
 
-    <distributionManagement>
-        <!-- Publish versioned releases here -->
-        <repository>
-            <id>sonatype-staging</id>
-            <name>Sonatype Release Staging Repository</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-        </repository>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.simpligility.maven.plugins</groupId>
+                <artifactId>android-maven-plugin</artifactId>
+                <version>4.4.3</version>
+                <extensions>true</extensions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-        <!-- Publish snapshots here -->
-        <snapshotRepository>
-            <id>sonatype-snapshot</id>
-            <name>Sonatype Snapshot Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
-    <!--repositories>
-        <repository>
-            <id>mantucon-repo</id>
-            <name>MANTUCON NEXUS</name>
-            <url>http://www.mantucon.net/nexus/content/groups/public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories-->
-
+        </plugins>
+    </build>
 </project>

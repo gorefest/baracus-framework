@@ -41,7 +41,6 @@ public class BeanContainer {
     protected final static Map<Class<?>, Object> pausedActivitiesMap = new HashMap<Class<?>, Object>();
     protected final static Map<Class<?>, Object> existingActivitiesMap = new HashMap<Class<?>, Object>();
 
-
     /**
      * Exception while destroying a bean. thrown if a shutdown caused
      * an error

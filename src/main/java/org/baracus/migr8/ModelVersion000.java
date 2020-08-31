@@ -26,6 +26,6 @@ public class ModelVersion000 implements MigrationStep {
 
     @Override
     public int getModelVersionNumber() {
-        return 0;
+        return 1;
     }
 }
