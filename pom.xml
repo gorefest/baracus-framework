@@ -98,7 +98,7 @@
         <profile>
             <id>windows</id>
             <properties>
-                <platform.version>4.0.1.2</platform.version>
+                <platform.version>4.1.1.4</platform.version>
                 <android.sdk.path>c:\entwicklung\jdk\android-sdk</android.sdk.path>
                 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
                 <docs.directory>C:/Temp/apidocs</docs.directory>
@@ -108,7 +108,7 @@
         <profile>
             <id>linux</id>
             <properties>
-                <platform.version>4.0.1.2</platform.version>
+                <platform.version>4.1.1.4</platform.version>
                 <android.sdk.path>/usr/java/adt-bundle-linux-x86_64/sdk</android.sdk.path>
                 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
             </properties>
@@ -118,7 +118,7 @@
         <profile>
             <id>ci-system</id>
             <properties>
-                <platform.version>4.0.1.2</platform.version>
+                <platform.version>4.1.1.4</platform.version>
                 <android.sdk.path>/usr/java/android-sdk-linux</android.sdk.path>
                 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
                 <docs.directory>/var/www/baracus/apidocs</docs.directory>
@@ -128,7 +128,7 @@
         <profile>
             <id>mac</id>
             <properties>
-                <platform.version>4.0.1.2</platform.version>
+                <platform.version>4.1.1.4</platform.version>
                 <android.sdk.path>/Users/heiko/Library/Android/sdk</android.sdk.path>
                 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
             </properties>

@@ -1,3 +1,7 @@
+VERSION 1.0.1
+- added ascii logo
+- added countAll function to count
+
 VERSION 1.0.0
 - Refactored workspace to be able to build an aar archive
 - fixed bad version in initial database migration step
