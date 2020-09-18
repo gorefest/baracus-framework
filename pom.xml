@@ -3,7 +3,8 @@
 
     <groupId>org.baracus</groupId>
     <artifactId>baracus-framework</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
+
     <packaging>aar</packaging>
     <name>baracus-framework</name>
     <description>The BARACUS Framework for lightweight DI, ORM and other cool stuff for Your Android application</description>
