@@ -27,7 +27,7 @@ public class Logger {
 
     private final String loggerId;
 
-    enum Level {
+    public enum Level {
         ERROR,
         WARN,
         INFO,
