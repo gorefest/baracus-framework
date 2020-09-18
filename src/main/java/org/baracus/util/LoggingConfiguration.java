@@ -53,7 +53,7 @@ public class LoggingConfiguration {
                 return;
             } else if (pack.getName().startsWith(packageName)) {
                 int precision = packageName.split(".").length;
-                if (precision > bestMatchPrecision) {
+                if (precision >= bestMatchPrecision) {
                     bestMatch = packageName;
                     bestMatchLevel = configuredMap.get(packageName);
                 }

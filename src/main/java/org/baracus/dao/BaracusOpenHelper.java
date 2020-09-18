@@ -91,7 +91,7 @@ public abstract class BaracusOpenHelper extends SQLiteOpenHelper implements Dest
     private final int targetDatabaseVersion;
 
     static {
-        upgradeSteps.put(110, new ModelVersion000());
+        upgradeSteps.put(0, new ModelVersion000());
     }
 
     /**

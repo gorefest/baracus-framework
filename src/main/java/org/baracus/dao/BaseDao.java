@@ -448,6 +448,14 @@ public abstract class BaseDao<T extends AbstractModelBase> {
 
     }
 
+    public int countAllRows(){
+        Cursor res = db.rawQuery( "select count("+ModelBase.idCol.fieldName+") from "+ getRowMapper().getAffectedTable(), null );
+        res.moveToFirst();
+        final int anInt = res.getInt(0);
+        res.close();
+        return anInt;
+    }
+
     /**
      * iterate the cursor in order to have a list of entity afterwards
      *

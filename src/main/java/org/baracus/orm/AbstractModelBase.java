@@ -19,6 +19,9 @@ public abstract class AbstractModelBase implements Identifiable {
     private final String tableName;
     private final boolean isOldStyle;
 
+    protected AbstractModelBase(String tableName){
+        this(tableName,false);
+    }
 
     AbstractModelBase(String tableName, boolean isOldStyle) {
         this.tableName = tableName;
