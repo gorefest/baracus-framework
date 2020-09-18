@@ -17,6 +17,7 @@ import org.baracus.lifecycle.ApplicationContextInitializer;
 import org.baracus.orm.AbstractModelBase;
 import org.baracus.signalling.*;
 import org.baracus.util.Logger;
+import org.baracus.util.Nerve;
 import org.baracus.validation.ValidationFactory;
 import org.baracus.validation.Validator;
 
@@ -145,6 +146,9 @@ public abstract class BaracusApplicationContext extends Application {
 
     public static synchronized void initApplicationContext() {
         if (!init) {
+            logger.info("Initializing BARACUS Framework");
+            logger.info(Nerve.logo);
+            long now = System.currentTimeMillis();
             init = true;
             beanContainer.createInstances();
 //            beanContainer.holdBean(Context.class, __instance);   // Inject a context simply
@@ -155,10 +159,14 @@ public abstract class BaracusApplicationContext extends Application {
             validationFactory = getBean(ValidationFactory.class);
             errorHandlingFactory = getBean(ErrorHandlingFactory.class);
 
+            logger.info("Baracus Core System initialized after $1 millis",System.currentTimeMillis() - now);
+
             if (applicationContextInitializer != null) {
                 beanContainer.performInjection(applicationContextInitializer);
                 applicationContextInitializer.afterContextIsBuilt();
             }
+            logger.info("Baracus Core System fully initialized after $1 millis",System.currentTimeMillis() - now);
+
         }
     }
 
