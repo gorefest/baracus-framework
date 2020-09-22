@@ -3,7 +3,7 @@
 
     <groupId>org.baracus</groupId>
     <artifactId>baracus-framework</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
 
     <packaging>aar</packaging>
     <name>baracus-framework</name>
@@ -148,12 +148,34 @@
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
+                                <configuration>
+                                    <executable>C:\Program Files\Git\usr\bin\gpg.exe</executable>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>sonatype</id>
+            <distributionManagement>
+                <!-- Publish versioned releases here -->
+                <repository>
+                    <id>sonatype-staging</id>
+                    <name>Sonatype Release Staging Repository</name>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+                </repository>
+
+                <!-- Publish snapshots here -->
+                <snapshotRepository>
+                    <id>sonatype-snapshot</id>
+                    <name>Sonatype Snapshot Repository</name>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+
     </profiles>
 
     <build>
